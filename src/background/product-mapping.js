@@ -1,4 +1,5 @@
 import { readCached, writeCached } from "./http-cache.js";
+import { MEDBUD_PATH_PATTERN } from "../shared/medbud-link.js";
 import { debug, warn } from "../shared/logging.js";
 
 const BUNDLED_MAPPING_PATH = "src/data/medbud-mapping.json";
@@ -95,7 +96,7 @@ export function readProducts(document)
 	{
 		if (typeof name !== "string" || name.length === 0) continue;
 		if (typeof path !== "string") continue;
-		if (!/^\/strains\/[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*\/$/.test(path)) continue;
+		if (!MEDBUD_PATH_PATTERN.test(path)) continue;
 
 		usable[name] = path;
 	}

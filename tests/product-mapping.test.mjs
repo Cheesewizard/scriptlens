@@ -100,12 +100,30 @@ test("falls back to the shipped mapping when the remote is unreachable", async (
 
 // A mapping is remote input, and a bad entry would put a card on the wrong
 // medication.
+// Carts, oils and edibles live under their own sections, not /strains/.
+test("accepts every medication section, not only strains", () =>
+{
+	const products = readProducts({
+		products: {
+			"Flower T20 10g": "/strains/brand/product/",
+			"Cart T800 1ml": "/vape-cartridges/brand/product/",
+			"Oil T10:C10 30ml": "/oils/brand/product/",
+			"Pastilles 14": "/edibles/brand/product/"
+		}
+	});
+
+	assert.equal(Object.keys(products).length, 4);
+	assert.equal(products["Cart T800 1ml"], "/vape-cartridges/brand/product/");
+	assert.equal(products["Oil T10:C10 30ml"], "/oils/brand/product/");
+});
+
 test("discards entries that are not a medication path", () =>
 {
 	const products = readProducts({
 		products: {
 			"Good T20 Flower 10g": "/strains/brand/product/",
 			"Brand page T20 Flower 10g": "/strains/brand/",
+			"Wrong section T20 Flower 10g": "/forums/thread/123/",
 			"Absolute T20 Flower 10g": "https://medbud.wiki/strains/brand/product/",
 			"Traversal T20 Flower 10g": "/strains/../../etc/passwd",
 			"Wrong type T20 Flower 10g": 42

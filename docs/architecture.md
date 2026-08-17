@@ -150,11 +150,15 @@ wrong medication.
 
 Resolution order is cheapest-first: shared mapping, then the local matcher, then a search on hover.
 
-The gap this exposes: the shipped formulary is scraped from `/strains/`, which is flower only, so the
-portal's vape, oil and pastille tabs resolve almost nothing locally — 34 of 40 flower products against
-roughly 1 of 44 everything else. MedBud keeps those in separate sections. Because the mapping is just
-name to path, covering them is a matter of adding entries and widening the path validation beyond
-`/strains/`, not of teaching the matcher three more naming schemes.
+This is what covers the non-flower tabs. The shipped formulary is scraped from `/strains/`, which is
+flower only, so the matcher resolves almost nothing on the vape, oil and pastille tabs — MedBud files
+those under `/vape-cartridges/`, `/oils/` and `/edibles/`, and their ratio-named products (`T200:C200`,
+`T10:C10`) tokenise differently from the merged slugs MedBud uses (`t200c200`, `t10c10`). Rather than
+teach the matcher three more naming schemes and a ratio grammar — risky, on a medicine — those tabs are
+covered by mapping entries, each verified against MedBud's own section index page. Path validation
+accepts all four sections. Across the full 84-product catalogue this takes direct-link coverage from
+42% to 90%; the remainder are renames, generic slugs and a few products MedBud has not listed, which
+fall back to search.
 
 ## Resolving the rest
 

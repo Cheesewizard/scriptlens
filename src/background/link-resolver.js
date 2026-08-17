@@ -1,5 +1,5 @@
 import { readCached, writeCached } from "./http-cache.js";
-import { MEDBUD_BASE_URL } from "../shared/medbud-link.js";
+import { MEDBUD_BASE_URL, MEDBUD_PATH_PATTERN } from "../shared/medbud-link.js";
 import { debug } from "../shared/logging.js";
 
 const SEARCH_ENDPOINT = "https://api.search.brave.com/res/v1/web/search";
@@ -12,7 +12,6 @@ const UNRESOLVED_TTL_MS = 24 * 60 * 60 * 1000;
 
 // Only a medication page will do. Brand landing pages and MedBud's own articles
 // are not what the card should link to.
-const PRODUCT_URL_PATTERN = /^https:\/\/medbud\.wiki(\/strains\/[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*\/)$/i;
 
 // One resolution per product, however many cards ask for it. The grid can show
 // the same medication more than once, and hovering re-enters constantly.
@@ -84,10 +83,13 @@ export function readProductPath(url)
 {
 	if (typeof url !== "string") return null;
 
-	// A trailing slash is how MedBud writes these; tolerate its absence.
-	const normalised = url.split(/[?#]/)[0].replace(/\/?$/, "/");
+	const withoutQuery = url.split(/[?#]/)[0];
+	if (!withoutQuery.startsWith(`${MEDBUD_BASE_URL}/`)) return null;
 
-	return PRODUCT_URL_PATTERN.exec(normalised)?.[1]?.toLowerCase() ?? null;
+	// A trailing slash is how MedBud writes these; tolerate its absence.
+	const path = withoutQuery.slice(MEDBUD_BASE_URL.length).replace(/\/?$/, "/").toLowerCase();
+
+	return MEDBUD_PATH_PATTERN.test(path) ? path : null;
 }
 
 export { MEDBUD_BASE_URL };
