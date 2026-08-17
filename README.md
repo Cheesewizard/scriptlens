@@ -17,6 +17,10 @@ Hovering shows MedBud's per-category breakdown — Medicinal Effect, Tastes & Te
 Uniformity, Freshness — which is usually what decides an order. The average links through to the full
 page for the written reviews.
 
+Once a product is matched, its **name on the card becomes a link** to the same MedBud page, opening in
+a new tab. It is an ordinary link, so middle-click and "open in new tab" behave normally, and clicking
+it does not also trigger the card's own navigation.
+
 ## Installing
 
 1. Clone this repository.

@@ -20,10 +20,12 @@ content-side code use normal imports. That is why `src/content/*.js` and `src/sh
 | `background/medbud-index.js` | Fetches, caches and pre-tokenises the medication index. |
 | `background/medbud-product.js` | Reads one medication page's rating microdata. |
 | `background/product-matcher.js` | Pure functions: tokenising and scoring. No I/O, so directly testable. |
+| `background/medbud-request.js` | MedBud fetching, Cloudflare challenge detection and backoff. |
 | `background/request-queue.js` | Caps concurrent outbound requests. |
 | `background/http-cache.js` | TTL cache over `chrome.storage.local`. |
 | `content/card-scanner.js` | Locates product cards and their titles. |
 | `content/rating-badge.js` | Builds and updates the badge DOM. |
+| `content/title-link.js` | Wraps the product title in a link to its MedBud page. |
 | `content/main.js` | Scanning loop and mutation observer. |
 
 ## Reading the CB1 portal
@@ -44,6 +46,15 @@ fixed depth. The badge goes before the title element, identified by exact text e
 The grid recycles DOM nodes when filters or tabs change, so a decorated card can come back holding a
 different product. Cards record which product they were decorated for in `data-medbud-product`, and a
 result arriving after the node has been reused is discarded.
+
+The title itself becomes a link to the matched MedBud page. It is *wrapped* rather than rewritten: the
+portal's own element, text and attributes are left alone, so React keeps the node it is holding, and
+the wrapper is `display: contents` so it generates no box and the grid layout is unchanged (measured in
+Chrome: zero delta on both the title and card bounding boxes). A real anchor is used instead of a click
+handler so middle-click, the context menu and "open in new tab" all work; the click is stopped from
+propagating because the whole card is clickable in the portal and the name should go to MedBud rather
+than also opening the portal's product page. Recycled cards are unwrapped before redecorating, or a
+card could point at the product it used to show.
 
 ## Reading MedBud
 

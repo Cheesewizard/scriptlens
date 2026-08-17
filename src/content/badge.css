@@ -64,6 +64,21 @@
 	color: currentColor;
 }
 
+/* `contents` means the anchor generates no box, so wrapping the portal's title
+   cannot shift the card layout. Colour and size stay inherited so the title
+   still looks like the portal's own text until it is hovered. */
+.medbud-title-link {
+	display: contents;
+	color: inherit;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.medbud-title-link:hover > * {
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
 .medbud-badge__link {
 	color: inherit;
 	text-decoration: none;

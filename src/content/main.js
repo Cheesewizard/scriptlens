@@ -1,5 +1,6 @@
 import { findProductCards, findTitleElement, PRODUCT_ATTRIBUTE } from "./card-scanner.js";
 import { createBadge, applyRating, applyError, applyBlocked, BADGE_CLASS } from "./rating-badge.js";
+import { linkTitle, unlinkTitles } from "./title-link.js";
 import { CHALLENGED_CODE, MESSAGE_TYPES } from "../shared/messages.js";
 import { loadSettings } from "../shared/settings.js";
 import { warn } from "../shared/logging.js";
@@ -40,6 +41,12 @@ function scan()
 
 async function decorate(card, productName)
 {
+	// A recycled card can still carry the previous product's badge and title
+	// link. Both go first: the link wraps the title, so it has to be undone
+	// before the title's parent is used as the badge's anchor point.
+	card.querySelector(`.${BADGE_CLASS}`)?.remove();
+	unlinkTitles(card);
+
 	const title = findTitleElement(card, productName);
 
 	if (!title)
@@ -47,9 +54,6 @@ async function decorate(card, productName)
 		warn(`no title element found for "${productName}"`, card);
 		return;
 	}
-
-	// A recycled card may still be showing the previous product's badge.
-	card.querySelector(`.${BADGE_CLASS}`)?.remove();
 
 	const badge = createBadge();
 	title.parentElement.insertBefore(badge, title);
@@ -83,6 +87,9 @@ async function decorate(card, productName)
 		}
 
 		applyRating(badge, response.result);
+
+		// Only a matched product has a page to point at.
+		if (response.result.matched && response.result.url) linkTitle(title, response.result.url);
 	}
 	catch (reason)
 	{

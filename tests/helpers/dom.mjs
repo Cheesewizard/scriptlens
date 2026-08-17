@@ -7,23 +7,27 @@ import { parseHTML } from "linkedom";
 
 export function loadFixture(name)
 {
-	const html = readFileSync(new URL(`../fixtures/${name}`, import.meta.url), "utf8");
-
-	installBrowserGlobals();
-
-	return parseHTML(html).document;
+	return install(readFileSync(new URL(`../fixtures/${name}`, import.meta.url), "utf8"));
 }
 
 export function parseFragment(html)
 {
-	installBrowserGlobals();
-
-	return parseHTML(html).document;
+	return install(html);
 }
 
-function installBrowserGlobals()
+// Content scripts run with `document` and `CSS` as globals, so the tests give
+// them the same shape — modules that build elements reach for the global
+// document exactly as they do in the browser.
+function install(html)
 {
+	const { document, window } = parseHTML(html);
+
 	if (!globalThis.CSS) globalThis.CSS = { escape: cssEscape };
+
+	globalThis.document = document;
+	globalThis.window = window;
+
+	return document;
 }
 
 // https://drafts.csswg.org/cssom/#the-css.escape()-method
