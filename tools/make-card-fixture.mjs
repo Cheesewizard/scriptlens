@@ -2,6 +2,7 @@
 // portal ("Save page as… / Web page, complete").
 //
 //   node tools/make-card-fixture.mjs "~/Downloads/Browse - CB1 Medical.html"
+//   node tools/make-card-fixture.mjs "~/Downloads/vape - CB1 Medical.html" cb1-vape-grid.html
 //
 // The saved page is a *patient* page: it carries the account holder's name and
 // their live prescription balances. Only the card grid is copied into the
@@ -11,7 +12,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { parseHTML } from "linkedom";
 
 const ADD_BUTTON_SELECTOR = "button[aria-label^='Add '][aria-label$=' to request']";
-const OUTPUT_PATH = new URL("../tests/fixtures/cb1-browse-grid.html", import.meta.url);
+const DEFAULT_OUTPUT_NAME = "cb1-browse-grid.html";
 
 // Anything that would mean patient data had leaked through into the grid.
 const PATIENT_DATA_PATTERNS = [
@@ -22,8 +23,10 @@ const PATIENT_DATA_PATTERNS = [
 	/\d+(\.\d+)?\s*(g|ml|pastilles)\s*left/i
 ];
 
-const sourcePath = process.argv[2];
-if (!sourcePath) throw new Error("usage: node tools/make-card-fixture.mjs <saved-page.html>");
+const [, , sourcePath, outputName = DEFAULT_OUTPUT_NAME] = process.argv;
+if (!sourcePath) throw new Error("usage: node tools/make-card-fixture.mjs <saved-page.html> [fixture-name.html]");
+
+const OUTPUT_PATH = new URL(`../tests/fixtures/${outputName}`, import.meta.url);
 
 const { document } = parseHTML(readFileSync(sourcePath, "utf8"));
 

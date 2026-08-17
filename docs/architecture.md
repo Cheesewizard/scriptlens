@@ -242,8 +242,16 @@ which is the case that would otherwise break the selector.
 
 ### Fixtures
 
-`tests/fixtures/cb1-browse-grid.html` is the real card grid, extracted from a saved browse page by
-`tools/make-card-fixture.mjs`. Regenerate it by saving the browse page and re-running that tool.
+`tests/fixtures/cb1-*-grid.html` are the real card grids from all four portal tabs, extracted from
+saved pages by `tools/make-card-fixture.mjs`. Regenerate one by saving that tab and re-running the tool
+with a fixture name. All four are covered because carts and oils are named quite differently to flower
+(`T800`, `25:25`) and their cards are not guaranteed to share markup — the scanner reads all 84
+products across the four tabs.
+
+A page saved from now on is saved with the extension running, so the tool also strips this extension's
+own badges, title links and `data-medbud-product` attributes. Without that the scanner tests would read
+output they produced themselves — and a scanner run against an undecorated copy finds nothing at all,
+since a card already carrying its product attribute is deliberately skipped.
 
 The saved page is a **patient** page: it carries the account holder's name and their live prescription
 balances. Only the grid subtree is copied, which leaves that data behind, and the tool refuses to write

@@ -53,6 +53,31 @@ const EXPECTED_NAMES = [
 	"4C Labs GGU T25 Grandi Guava Flower 10g"
 ];
 
+// The portal sells four kinds of medication on four tabs, and the scanner has to
+// read all of them: carts and oils are named quite differently to flower
+// ("T800", "25:25") and their cards are not guaranteed to share markup.
+const EVERY_TAB = [
+	["flower", GRID, 40],
+	["vapes", "cb1-vape-grid.html", 22],
+	["oils", "cb1-oil-grid.html", 20],
+	["pastilles", "cb1-pastille-grid.html", 2]
+];
+
+test("reads every card on every tab, not just flower", () =>
+{
+	for (const [tab, fixture, expected] of EVERY_TAB)
+	{
+		const cards = findProductCards(loadFixture(fixture));
+
+		assert.equal(cards.length, expected, `wrong card count on the ${tab} tab`);
+
+		for (const { card, productName } of cards)
+		{
+			assert.ok(findTitleElement(card, productName), `no title for ${productName} on the ${tab} tab`);
+		}
+	}
+});
+
 test("finds every product card in a real browse grid", () =>
 {
 	const cards = findProductCards(loadFixture(GRID));
