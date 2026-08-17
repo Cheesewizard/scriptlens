@@ -94,6 +94,19 @@ the candidate the title covers. This is symmetric like Jaccard but tolerates Med
 abbreviate a longer CB1 name — `/strains/wellford/t25-mac/` for `Wellford Luma MAC T25 Miracle Alien
 Cookies #3`, which Jaccard scored below threshold.
 
+Matching runs twice. The first pass is the rules above, with potency required. Only if that finds
+nothing does a second pass allow the potencies to differ — because CB1 labels the batch it is selling
+while MedBud names the medication once, so CB1's `Greyscales JFRO T23 Jack Frosted` is MedBud's
+`jfro-t24-jack-frosted`. Measured against a live browse page this is worth about eight points of match
+rate, 75% to 83%.
+
+The relaxed pass is deliberately narrow, because a looser first attempt produced two confident wrong
+matches against real stock: `Papers RS-ELV T24 RS-11` landed on Doja's `rs-11`, and `All Nations MD T22
+MAC Daddy` on `t27-mac-doughnut`. It therefore requires the brand to agree *and* every strain word of
+the candidate to appear in the title — so only the potency is ever forgiven. Both wrong matches are
+regression tests. Where MedBud lists several potencies of one medication the exact one still wins,
+since the first pass runs first, and ties break towards the nearest potency.
+
 One shortcut sits above the scoring: if both sides collapse to an identical run of characters they are
 the same product. CB1 writes `L.A. S.A.G.E.` where MedBud writes `la-sage`; these tokenise completely
 differently but both compact to `ipslast26lasage`.

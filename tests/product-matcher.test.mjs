@@ -33,7 +33,12 @@ const EXPECTED_MATCHES = new Map([
 	["Curaleaf GZZ T23 GMO ZKZ Flower 10g", "/strains/curaleaf/gzz-t23/"],
 	["4C Labs Core PGL T22 Platinum Garlic Flower 10g", "/strains/4c-labs/pgl-t22-platinum-garlic/"],
 	["Curaleaf LCE T20 Lavender Cake Flower 10g", "/strains/curaleaf/t20-lavender-cake/"],
-	["Curaleaf TPI T20 Tripoli Flower 10g", "/strains/curaleaf/t20-tripoli/"]
+	["Curaleaf TPI T20 Tripoli Flower 10g", "/strains/curaleaf/t20-tripoli/"],
+
+	// MedBud lists this medication only at T27. CB1 labels the batch it is
+	// selling, so the potencies differ while the brand, product code and strain
+	// all agree — the same medication, resolved by the potency-tolerant pass.
+	["4C Labs Core ACB T21 Acai Berry Flower 10g", "/strains/4c-labs/acb-t27-acai-berry/"]
 ]);
 
 // Listed on CB1 but missing from this index snapshot. A miss is the correct
@@ -41,7 +46,6 @@ const EXPECTED_MATCHES = new Map([
 const EXPECTED_MISSES = [
 	"All Nations MD T22 MAC Daddy Flower 10g",
 	"4C Labs Value SCK-S Smalls T22 Strawberry Cake Flower 10g",
-	"4C Labs Core ACB T21 Acai Berry Flower 10g",
 	"Curaleaf RMY T20 Royal Moby Flower 10g",
 	"Tastee Bitz PS T18 Banjo Medical Cannabis Flower 10g"
 ];
@@ -88,6 +92,29 @@ test("separates products differing only by potency", () =>
 	const match = findBestMatch("SafriCanna CK T22 Creamy Kees #5 Flower 10g", CANDIDATES, MINIMUM_SCORE);
 
 	assert.notEqual(match?.path, "/strains/safricanna/ck-t27-creamy-kees/");
+});
+
+// The potency-tolerant pass exists for batch labelling and nothing else. Both of
+// these were live wrong matches produced by a looser first attempt at it.
+test("does not cross brands to forgive a potency difference", () =>
+{
+	const match = findBestMatch("Papers RS-ELV T24 RS-11 Flower 10g", CANDIDATES, MINIMUM_SCORE);
+
+	assert.notEqual(match?.path, "/strains/doja/rs-11/", "matched another brand's medication");
+});
+
+test("does not forgive a potency difference on a partial strain name", () =>
+{
+	const match = findBestMatch("All Nations MD T22 MAC Daddy Flower 10g", CANDIDATES, MINIMUM_SCORE);
+
+	assert.notEqual(match?.path, "/strains/all-nations/t27-mac-doughnut/", "MAC Daddy is not MAC Doughnut");
+});
+
+test("prefers the exact potency when MedBud lists both", () =>
+{
+	const match = findBestMatch("SafriCanna CK T22 Creamy Kees #5 Flower 10g", CANDIDATES, MINIMUM_SCORE);
+
+	assert.equal(match.path, "/strains/safricanna/ck-t22-creamy-kees-5/");
 });
 
 test("separates products differing only by product code", () =>
