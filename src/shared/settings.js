@@ -10,7 +10,10 @@ export const DEFAULT_SETTINGS = Object.freeze({
 	// following it. Worth turning on again if MedBud's protection relaxes.
 	liveRatings: false,
 
-	showUnmatchedProducts: false,
+	// On by default: an unmatched product now offers a search that finds it,
+	// rather than the bare "No MedBud entry" this once hid. Off, most of the grid
+	// has no badge at all, which reads as the extension half-working.
+	showUnmatchedProducts: true,
 	debugLogging: false
 });
 
