@@ -12,7 +12,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
 		.catch(reason =>
 		{
 			error(reason);
-			sendResponse({ ok: false, reason: reason?.message ?? String(reason) });
+
+			// The code travels separately because an Error does not survive the
+			// structured clone across the message channel.
+			sendResponse({ ok: false, reason: reason?.message ?? String(reason), code: reason?.code ?? null });
 		});
 
 	// Keeps the message channel open for the asynchronous response above.

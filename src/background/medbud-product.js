@@ -1,4 +1,5 @@
 import { readCached, writeCached } from "./http-cache.js";
+import { fetchMedBudText } from "./medbud-request.js";
 
 const BASE_URL = "https://medbud.wiki";
 
@@ -31,10 +32,7 @@ export async function loadProductRating(path)
 async function fetchProductRating(path)
 {
 	const url = BASE_URL + path;
-	const response = await fetch(url, { credentials: "include" });
-	if (!response.ok) throw new Error(`MedBud product request failed with status ${response.status} for ${path}`);
-
-	const html = await response.text();
+	const html = await fetchMedBudText(url, { label: path });
 
 	return { url, ...readAggregateRating(html), categories: readCategoryRatings(html), medbudId: html.match(MEDBUD_ID_PATTERN)?.[0] ?? null };
 }

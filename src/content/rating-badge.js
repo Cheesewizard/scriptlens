@@ -50,6 +50,20 @@ export function applyError(badge, reason)
 	badge.title = reason?.message ?? String(reason);
 }
 
+// Cloudflare challenges cannot be answered by a background fetch, so this is a
+// state the user can actually clear — say so, rather than reporting a failure
+// that looks like a bug in the extension.
+export function applyBlocked(badge, reason)
+{
+	if (!badge) throw new Error("badge is required");
+
+	badge.replaceChildren();
+	delete badge.dataset.tier;
+	badge.dataset.state = "blocked";
+	badge.title = reason ?? "MedBud is challenging automated requests.";
+	badge.append(buildLink("https://medbud.wiki/", "MedBud check needed"));
+}
+
 function buildStars(average, bestRating)
 {
 	const stars = document.createElement("span");

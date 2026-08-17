@@ -21,6 +21,13 @@
 	color: rgba(255, 255, 255, 0.38);
 }
 
+/* Actionable rather than broken: the user can clear a Cloudflare challenge. */
+.medbud-badge[data-state="blocked"] {
+	border-color: rgba(250, 204, 21, 0.35);
+	font-weight: 400;
+	color: rgba(250, 204, 21, 0.85);
+}
+
 .medbud-badge[data-tier="high"] {
 	border-color: rgba(74, 222, 128, 0.45);
 	color: #4ade80;

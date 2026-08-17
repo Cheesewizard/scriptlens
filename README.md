@@ -11,6 +11,7 @@ Each card gains a small badge above its title:
 | ★★★☆☆ 3.00 · 1 rating | Matched, with MedBud's community average. Colour-coded green / amber / red. |
 | Not yet rated | Matched a MedBud page, but nobody has rated it yet. |
 | No MedBud entry | No confident match. Hidden by default; enable it in options. |
+| MedBud check needed | Cloudflare is challenging requests. Open [medbud.wiki](https://medbud.wiki) in a tab, clear the check, reload. |
 
 Hovering shows MedBud's per-category breakdown — Medicinal Effect, Tastes & Terpenes, Trim &
 Uniformity, Freshness — which is usually what decides an order. The average links through to the full
@@ -98,6 +99,11 @@ itself.
   change on either side will still break things. Failures are loud rather than silently wrong.
 - MedBud has announced that some data is moving behind a login for MHRA reasons. If that covers
   ratings, sign in to MedBud in the same browser.
+- MedBud is behind Cloudflare bot mitigation. The extension works because it inherits the clearance
+  your own browsing of MedBud earned; a browser profile that has never visited MedBud gets nothing.
+  If every card reads *MedBud check needed*, open MedBud in a tab, clear the check and reload. MedBud's
+  `robots.txt` permits the pages this reads, but it is asking for less automated load, which is why a
+  challenge backs the extension off rather than making it retry per card.
 - Ratings are patient opinions collected by a community site, not clinical guidance. Useful for
   narrowing a shortlist, not for deciding what to take — that conversation belongs with your prescriber.
   MedBud says the same thing on every page it publishes.

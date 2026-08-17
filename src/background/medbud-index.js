@@ -1,4 +1,5 @@
 import { readCached, writeCached } from "./http-cache.js";
+import { fetchMedBudText } from "./medbud-request.js";
 import { describeCandidate } from "./product-matcher.js";
 import { debug } from "../shared/logging.js";
 
@@ -45,12 +46,7 @@ export async function loadCandidates(options)
 
 async function fetchProductPaths()
 {
-	// Credentials are included so a signed-in MedBud session is honoured; MedBud
-	// has announced that some data is moving behind a login.
-	const response = await fetch(INDEX_URL, { credentials: "include" });
-	if (!response.ok) throw new Error(`MedBud index request failed with status ${response.status}`);
-
-	const html = await response.text();
+	const html = await fetchMedBudText(INDEX_URL, { label: "the medication index" });
 	const paths = new Set();
 
 	for (const match of html.matchAll(PRODUCT_LINK_PATTERN))

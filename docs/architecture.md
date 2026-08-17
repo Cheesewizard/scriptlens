@@ -86,6 +86,39 @@ One shortcut sits above the scoring: if both sides collapse to an identical run 
 the same product. CB1 writes `L.A. S.A.G.E.` where MedBud writes `la-sage`; these tokenise completely
 differently but both compact to `ipslast26lasage`.
 
+## Cloudflare
+
+MedBud sits behind Cloudflare bot mitigation. A request from the service worker with no clearance gets
+`403` with `cf-mitigated: challenge` and the "Security Check" interstitial, which asks for a click and
+says in as many words that it is there to stop automated scraping and AI crawlers.
+
+A background `fetch` cannot answer an interactive challenge. What makes the extension work at all is
+that `credentials: "include"` carries the `cf_clearance` cookie the user's *ordinary browsing* of
+MedBud already earned, so the extension rides on a human session rather than presenting as a bot. When
+that cookie is absent or expired — a fresh profile, or a while since MedBud was last visited — every
+lookup fails until the user opens MedBud in a tab.
+
+That is a user-clearable state, not a bug, so it is reported as one. `medbud-request.js` detects the
+challenge, throws a `MedBudChallengeError` carrying `CHALLENGED_CODE`, and the badge renders "MedBud
+check needed" linking to MedBud instead of "lookup failed". The code travels as a field on the response
+because an `Error` does not survive the structured clone across the message channel.
+
+Detection prefers Cloudflare's `cf-mitigated` header — readable because extension fetches carry host
+permissions and are not CORS-restricted — and falls back to sniffing the interstitial body, but only on
+403 and 503, so an ordinary 403 is still reported as an ordinary 403.
+
+Once challenged, the module fails fast for five minutes rather than sending one doomed request per
+card: a grid of 23 cards otherwise produces 23 blocked requests against a site that is explicitly
+asking for less automated load. That backoff is module state, so it resets when the MV3 worker is
+evicted — which is the right default, since the next page load then re-probes whether the user has
+cleared the challenge.
+
+Worth knowing for the project's standing: MedBud's `robots.txt` disallows AI crawlers by name
+(`ClaudeBot`, `GPTBot`, `OAI-SearchBot`, and others) but allows `*` on `/strains/`, which is what this
+extension reads. The extension's access pattern — a signed-in human's browser, one index fetch per six
+hours, cached ratings — is within that. Bulk or automated collection outside a user's own browsing
+would not be.
+
 ## Testing
 
 The scoring and microdata parsing are pure functions and are tested directly. `card-scanner.js` is not
