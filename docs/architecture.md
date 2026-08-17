@@ -20,7 +20,8 @@ content-side code use normal imports. That is why `src/content/*.js` and `src/sh
 | `background/medbud-index.js` | Fetches, caches and pre-tokenises the medication index. |
 | `background/medbud-product.js` | Reads one medication page's rating microdata. |
 | `background/product-matcher.js` | Pure functions: tokenising and scoring. No I/O, so directly testable. |
-| `background/medbud-request.js` | MedBud fetching, Cloudflare challenge detection and backoff. |
+| `background/medbud-request.js` | MedBud fetching, Cloudflare challenge detection and backoff. Only used when live ratings are enabled. |
+| `shared/medbud-link.js` | Builds the medication URL, or the search that replaces it. |
 | `background/request-queue.js` | Caps concurrent outbound requests. |
 | `background/http-cache.js` | TTL cache over `chrome.storage.local`. |
 | `content/card-scanner.js` | Locates product cards and their titles. |
@@ -96,6 +97,23 @@ Cookies #3`, which Jaccard scored below threshold.
 One shortcut sits above the scoring: if both sides collapse to an identical run of characters they are
 the same product. CB1 writes `L.A. S.A.G.E.` where MedBud writes `la-sage`; these tokenise completely
 differently but both compact to `ipslast26lasage`.
+
+## Why the formulary is bundled
+
+Measured against a live browse page, matching the shipped snapshot resolves roughly a third of current
+stock to an exact page. That is not a matcher defect: the snapshot ages, CB1 rotates stock constantly,
+and MedBud renames medications — CB1's `Aurora Pedanios SRD T29 Sourdough` lives at
+`/strains/aurora-pedanios/pedanios-t29/`, a slug carrying neither the product code (`SRD`) nor the
+strain name (`sourdough`). Loosening the matcher to catch that would start producing wrong matches, and
+a wrong rating on a medicine is worse than none.
+
+So an unmatched product links to a search restricted to MedBud instead. Every card therefore leads
+somewhere, the matcher stays strict, and the case it cannot solve is handled by the thing that solves
+it well. The tiers are: confident match → the medication's page; anything else → a search.
+
+Refreshing the formulary means shipping a new version of the extension. That is a deliberate trade:
+fetching it at runtime is what Cloudflare refuses, and a stale snapshot plus a search fallback works,
+where a live index works not at all.
 
 ## Cloudflare
 

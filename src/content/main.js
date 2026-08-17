@@ -80,6 +80,12 @@ async function decorate(card, productName)
 			return;
 		}
 
+		// The name always leads somewhere: the matched page when there is one,
+		// otherwise a search, which is how a renamed or newly listed medication
+		// gets found.
+		const destination = response.result.url ?? response.result.searchUrl;
+		if (destination) linkTitle(title, destination);
+
 		if (!response.result.matched && !settings.showUnmatchedProducts)
 		{
 			badge.remove();
@@ -87,9 +93,6 @@ async function decorate(card, productName)
 		}
 
 		applyRating(badge, response.result);
-
-		// Only a matched product has a page to point at.
-		if (response.result.matched && response.result.url) linkTitle(title, response.result.url);
 	}
 	catch (reason)
 	{

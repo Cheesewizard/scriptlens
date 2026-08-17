@@ -3,6 +3,7 @@ import { loadCandidates } from "./medbud-index.js";
 import { loadProductRating } from "./medbud-product.js";
 import { findBestMatch } from "./product-matcher.js";
 import { enqueue } from "./request-queue.js";
+import { productUrl, searchUrl } from "../shared/medbud-link.js";
 import { loadSettings } from "../shared/settings.js";
 import { debug } from "../shared/logging.js";
 
@@ -14,7 +15,8 @@ const UNMATCHED_TTL_MS = 60 * 60 * 1000;
 
 // If nothing matches and the index has aged at all, the index is refetched once
 // before the miss is accepted. Without this a strain added to MedBud today would
-// stay invisible until the cached index expired on its own.
+// stay invisible until the cached index expired on its own. Only meaningful for
+// a live index; the bundled formulary cannot be refreshed at runtime.
 const REFRESH_ON_MISS_AFTER_MS = 30 * 60 * 1000;
 
 // The grid can redraw the same product into several cards at once, so identical
@@ -36,36 +38,44 @@ export function requestRating(productName)
 
 async function resolveRating(productName)
 {
-	const match = await resolveMatch(productName);
+	const settings = await loadSettings();
+	const match = await resolveMatch(productName, settings);
 
+	// Every product gets somewhere to go. Without a confident match that is a
+	// search, which is what finds a medication MedBud has renamed or listed since
+	// the bundled formulary was captured.
 	if (!match.path)
 	{
-		debug(`no MedBud match for "${productName}"`);
-		return { productName, matched: false };
+		debug(`no MedBud match for "${productName}"; falling back to search`);
+
+		return { productName, matched: false, searchUrl: searchUrl(productName) };
 	}
+
+	const url = productUrl(match.path);
+
+	if (!settings.liveRatings) return { productName, matched: true, matchScore: match.score, url, ratingsFetched: false };
 
 	const rating = await loadProductRating(match.path);
 
-	return { productName, matched: true, matchScore: match.score, ...rating };
+	return { productName, matched: true, matchScore: match.score, ratingsFetched: true, ...rating };
 }
 
-async function resolveMatch(productName)
+async function resolveMatch(productName, settings)
 {
 	const cacheKey = `match:${productName}`;
 	const cached = await readCached(cacheKey);
 	if (cached) return cached;
 
-	const { minimumMatchScore } = await loadSettings();
-	const index = await loadCandidates();
+	const index = await loadCandidates({ live: settings.liveRatings });
 
-	let match = findBestMatch(productName, index.candidates, minimumMatchScore);
+	let match = findBestMatch(productName, index.candidates, settings.minimumMatchScore);
 
-	if (match === null && Date.now() - index.fetchedAt > REFRESH_ON_MISS_AFTER_MS)
+	if (match === null && !index.bundled && Date.now() - index.fetchedAt > REFRESH_ON_MISS_AFTER_MS)
 	{
 		debug(`refreshing MedBud index after a miss on "${productName}"`);
 
-		const refreshed = await loadCandidates({ forceRefresh: true });
-		match = findBestMatch(productName, refreshed.candidates, minimumMatchScore);
+		const refreshed = await loadCandidates({ live: true, forceRefresh: true });
+		match = findBestMatch(productName, refreshed.candidates, settings.minimumMatchScore);
 	}
 
 	const resolved = match ?? { path: null, score: 0 };

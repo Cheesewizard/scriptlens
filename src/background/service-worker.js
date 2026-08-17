@@ -33,13 +33,13 @@ async function handleMessage(message)
 			return requestRating(message.productName);
 
 		case MESSAGE_TYPES.REFRESH_INDEX:
-			return describeIndex(await loadIndex({ forceRefresh: true }));
+			return describeIndex(await loadIndex({ forceRefresh: true, live: true }));
 
 		case MESSAGE_TYPES.CLEAR_CACHE:
 			return { removedEntries: await clearCache() };
 
 		case MESSAGE_TYPES.GET_STATUS:
-			return { ...describeIndex(await loadIndex()), settings };
+			return { ...describeIndex(await loadIndex({ live: settings.liveRatings })), settings };
 
 		default:
 			throw new Error(`Unknown message type: ${message?.type}`);
@@ -51,6 +51,7 @@ function describeIndex(index)
 	return {
 		indexedProducts: index.paths.length,
 		fetchedAt: index.fetchedAt,
-		expiresAt: index.fetchedAt + INDEX_TTL_MS
+		expiresAt: index.fetchedAt + INDEX_TTL_MS,
+		bundled: index.bundled === true
 	};
 }

@@ -8,10 +8,14 @@ Each card gains a small badge above its title:
 
 | State | Meaning |
 | --- | --- |
-| ★★★☆☆ 3.00 · 1 rating | Matched, with MedBud's community average. Colour-coded green / amber / red. |
+| View on MedBud | Matched a MedBud page. The default state — see *Why no ratings inline* below. |
+| Find on MedBud | Not in the bundled formulary. Links to a search that lands on the page. |
+| ★★★☆☆ 3.00 · 1 rating | MedBud's community average, when live ratings are enabled and reachable. |
 | Not yet rated | Matched a MedBud page, but nobody has rated it yet. |
-| No MedBud entry | No confident match. Hidden by default; enable it in options. |
-| MedBud check needed | Cloudflare is challenging requests. Open [medbud.wiki](https://medbud.wiki) in a tab, clear the check, reload. |
+| MedBud check needed | Live ratings are on and Cloudflare is refusing the request. |
+
+The product name itself is also a link to the same place, so clicking the medication goes straight
+there.
 
 Hovering shows MedBud's per-category breakdown — Medicinal Effect, Tastes & Terpenes, Trim &
 Uniformity, Freshness — which is usually what decides an order. The average links through to the full
@@ -29,18 +33,32 @@ it does not also trigger the card's own navigation.
 
 No build step — the extension loads as-is.
 
+## Why no ratings inline
+
+MedBud is behind Cloudflare bot mitigation that refuses the extension's background requests outright —
+`403`, `cf-mitigated: challenge` — while the same URL loads fine in a tab. There is no way for an MV3
+background fetch to present as a page navigation, and the workaround that would "fix" it is automating
+what that protection exists to stop. So the extension does not fetch from MedBud at all.
+
+Instead it ships MedBud's formulary and does the matching locally, then links you to the page. You lose
+the number on the card; you keep never having to search for the medication by hand.
+
+Live fetching is still in the code behind an off-by-default option, for if MedBud's protection relaxes.
+
 ## How it works
 
-1. The service worker fetches MedBud's medication index once and caches the ~1,200 page paths.
+1. A snapshot of MedBud's formulary (1,091 medications) ships in `src/data/medbud-index.json`.
 2. The content script reads each card's product name from its `aria-label`.
-3. Names are matched against the index. The potency (`T30`), the product code (`WF`, `TT-M`) and the
-   strain words all have to agree, which is what stops `LIT WF T30 White Fire` being confused with
+3. Names are matched against the formulary. The potency (`T30`), the product code (`WF`, `TT-M`) and
+   the strain words all have to agree, which is what stops `LIT WF T30 White Fire` being confused with
    `LIT SL T30 Snow Lotus`.
-4. The matched page is fetched and its schema.org `AggregateRating` microdata read.
+4. A confident match links to that medication's page. Anything else links to a search restricted to
+   MedBud, which is what finds a medication listed since the snapshot, or renamed.
 
-MedBud requests carry credentials, so a signed-in MedBud session in the same browser applies. Lookups
-are capped at four concurrent requests and everything is cached, so a browse session costs a handful of
-requests rather than one per card.
+The fallback is the common path, not an edge case. Stock rotates constantly and MedBud renames
+medications: CB1's `Aurora Pedanios SRD T29 Sourdough` is MedBud's `Aurora SRD-CA T29 Sourdough` at
+`/strains/aurora-pedanios/pedanios-t29/` — a slug with neither the product code nor the strain name in
+it. No token matcher resolves that; a search does.
 
 ### Cache lifetimes
 

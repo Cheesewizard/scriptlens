@@ -21,8 +21,19 @@ export function applyRating(badge, rating)
 
 	if (!rating.matched)
 	{
+		// Not "no entry": the formulary shipped with the extension is a snapshot,
+		// so an absent product usually means renamed or listed since, not missing.
 		badge.dataset.state = "unmatched";
-		badge.textContent = "No MedBud entry";
+		badge.append(buildLink(rating.searchUrl, "Find on MedBud"));
+		return;
+	}
+
+	// Nothing was fetched, so there is no rating to show — only the page to read
+	// it on, which is the whole point of the link.
+	if (rating.ratingsFetched === false)
+	{
+		badge.dataset.state = "linked";
+		badge.append(buildLink(rating.url, "View on MedBud"));
 		return;
 	}
 

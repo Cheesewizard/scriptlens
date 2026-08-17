@@ -7,8 +7,10 @@ import { findBestMatch, describeCandidate, readProductCode, tokenise } from "../
 const MINIMUM_SCORE = 0.45;
 
 // The real MedBud formulary and the real set of product names from a browse page,
-// captured from both live sites.
-const CANDIDATES = readFixture("medbud-index.json").map(describeCandidate);
+// captured from both live sites. The formulary is read from the copy the
+// extension actually ships, so these tests police the shipped data rather than a
+// fixture that could drift away from it.
+const CANDIDATES = readShipped("medbud-index.json").map(describeCandidate);
 const PRODUCT_NAMES = readFixture("cb1-product-names.json");
 
 // Every product on the captured browse page that is present in the captured index.
@@ -105,4 +107,10 @@ test("ignores slugs too generic to identify a product", () =>
 function readFixture(name)
 {
 	return JSON.parse(readFileSync(new URL(`./fixtures/${name}`, import.meta.url), "utf8"));
+}
+
+// Read from what the extension ships, not a copy of it.
+function readShipped(name)
+{
+	return JSON.parse(readFileSync(new URL(`../src/data/${name}`, import.meta.url), "utf8"));
 }

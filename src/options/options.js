@@ -6,6 +6,7 @@ const FEEDBACK_TIMEOUT_MS = 2500;
 const minimumMatchScoreInput = document.getElementById("minimumMatchScore");
 const minimumMatchScoreValue = document.getElementById("minimumMatchScoreValue");
 const showUnmatchedProductsInput = document.getElementById("showUnmatchedProducts");
+const liveRatingsInput = document.getElementById("liveRatings");
 const debugLoggingInput = document.getElementById("debugLogging");
 const refreshIndexButton = document.getElementById("refreshIndex");
 const clearCacheButton = document.getElementById("clearCache");
@@ -22,12 +23,14 @@ async function initialise()
 
 	minimumMatchScoreInput.value = String(settings.minimumMatchScore);
 	showUnmatchedProductsInput.checked = settings.showUnmatchedProducts;
+	liveRatingsInput.checked = settings.liveRatings;
 	debugLoggingInput.checked = settings.debugLogging;
 	renderMatchScore();
 
 	minimumMatchScoreInput.addEventListener("input", renderMatchScore);
 	minimumMatchScoreInput.addEventListener("change", persist);
 	showUnmatchedProductsInput.addEventListener("change", persist);
+	liveRatingsInput.addEventListener("change", persist);
 	debugLoggingInput.addEventListener("change", persist);
 	refreshIndexButton.addEventListener("click", handleRefreshIndex);
 	clearCacheButton.addEventListener("click", handleClearCache);
@@ -44,6 +47,7 @@ async function persist()
 {
 	await saveSettings({
 		minimumMatchScore: Number(minimumMatchScoreInput.value),
+		liveRatings: liveRatingsInput.checked,
 		showUnmatchedProducts: showUnmatchedProductsInput.checked,
 		debugLogging: debugLoggingInput.checked
 	});
@@ -86,8 +90,18 @@ async function renderStatus(messageType)
 		return;
 	}
 
-	const { indexedProducts, fetchedAt, expiresAt } = response.result;
+	const { indexedProducts, fetchedAt, expiresAt, bundled } = response.result;
 
+	// The bundled formulary has no age and cannot be refreshed at runtime —
+	// updating it means shipping a new version of the extension.
+	if (bundled)
+	{
+		refreshIndexButton.disabled = true;
+		statusText.textContent = `${indexedProducts} medications in the formulary bundled with the extension. Nothing is requested from MedBud; products it does not list fall back to a search.`;
+		return;
+	}
+
+	refreshIndexButton.disabled = false;
 	statusText.textContent = `${indexedProducts} medications indexed ${describeAge(fetchedAt)}. Refreshes automatically ${describeDue(expiresAt)}.`;
 }
 
