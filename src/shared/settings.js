@@ -14,6 +14,14 @@ export const DEFAULT_SETTINGS = Object.freeze({
 	// rather than the bare "No MedBud entry" this once hid. Off, most of the grid
 	// has no badge at all, which reads as the extension half-working.
 	showUnmatchedProducts: true,
+
+	// A Brave Search API key. Without one, a product the formulary does not list
+	// links to a search page you finish by hand; with one, the extension asks the
+	// search API on hover and the card links straight to the medication. The
+	// search engine is queried, never MedBud — MedBud is only ever opened by you
+	// clicking the link.
+	searchApiKey: "",
+
 	debugLogging: false
 });
 

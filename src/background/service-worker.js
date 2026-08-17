@@ -1,6 +1,8 @@
 import { clearCache } from "./http-cache.js";
 import { loadIndex, INDEX_TTL_MS } from "./medbud-index.js";
+import { resolveProductLink } from "./link-resolver.js";
 import { requestRating } from "./rating-service.js";
+import { productUrl } from "../shared/medbud-link.js";
 import { MESSAGE_TYPES } from "../shared/messages.js";
 import { loadSettings } from "../shared/settings.js";
 import { setDebugLogging, error } from "../shared/logging.js";
@@ -32,6 +34,9 @@ async function handleMessage(message)
 		case MESSAGE_TYPES.REQUEST_RATING:
 			return requestRating(message.productName);
 
+		case MESSAGE_TYPES.RESOLVE_LINK:
+			return describeResolvedLink(await resolveProductLink(message.productName, settings.searchApiKey));
+
 		case MESSAGE_TYPES.REFRESH_INDEX:
 			return describeIndex(await loadIndex({ forceRefresh: true, live: true }));
 
@@ -44,6 +49,11 @@ async function handleMessage(message)
 		default:
 			throw new Error(`Unknown message type: ${message?.type}`);
 	}
+}
+
+function describeResolvedLink(resolved)
+{
+	return { url: resolved.path === null ? null : productUrl(resolved.path), reason: resolved.reason };
 }
 
 function describeIndex(index)

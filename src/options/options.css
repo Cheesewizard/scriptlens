@@ -57,6 +57,17 @@ input[type="range"] {
 	width: 100%;
 }
 
+input[type="password"],
+input[type="text"] {
+	width: 100%;
+	padding: 8px 10px;
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.04);
+	color: inherit;
+	font: inherit;
+}
+
 button {
 	align-self: flex-start;
 	padding: 8px 14px;

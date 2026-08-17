@@ -6,6 +6,7 @@ const FEEDBACK_TIMEOUT_MS = 2500;
 const minimumMatchScoreInput = document.getElementById("minimumMatchScore");
 const minimumMatchScoreValue = document.getElementById("minimumMatchScoreValue");
 const showUnmatchedProductsInput = document.getElementById("showUnmatchedProducts");
+const searchApiKeyInput = document.getElementById("searchApiKey");
 const liveRatingsInput = document.getElementById("liveRatings");
 const debugLoggingInput = document.getElementById("debugLogging");
 const refreshIndexButton = document.getElementById("refreshIndex");
@@ -23,6 +24,7 @@ async function initialise()
 
 	minimumMatchScoreInput.value = String(settings.minimumMatchScore);
 	showUnmatchedProductsInput.checked = settings.showUnmatchedProducts;
+	searchApiKeyInput.value = settings.searchApiKey;
 	liveRatingsInput.checked = settings.liveRatings;
 	debugLoggingInput.checked = settings.debugLogging;
 	renderMatchScore();
@@ -30,6 +32,7 @@ async function initialise()
 	minimumMatchScoreInput.addEventListener("input", renderMatchScore);
 	minimumMatchScoreInput.addEventListener("change", persist);
 	showUnmatchedProductsInput.addEventListener("change", persist);
+	searchApiKeyInput.addEventListener("change", persist);
 	liveRatingsInput.addEventListener("change", persist);
 	debugLoggingInput.addEventListener("change", persist);
 	refreshIndexButton.addEventListener("click", handleRefreshIndex);
@@ -47,6 +50,7 @@ async function persist()
 {
 	await saveSettings({
 		minimumMatchScore: Number(minimumMatchScoreInput.value),
+		searchApiKey: searchApiKeyInput.value.trim(),
 		liveRatings: liveRatingsInput.checked,
 		showUnmatchedProducts: showUnmatchedProductsInput.checked,
 		debugLogging: debugLoggingInput.checked
