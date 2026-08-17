@@ -1,8 +1,8 @@
 # CB1 x MedBud Ratings
 
 A Chrome extension that pulls patient ratings from [MedBud.wiki](https://medbud.wiki) and shows them
-directly on the medication cards in the CB1 Medical patient portal, so a browse session doesn't need a
-second tab and a manual search for every product.
+directly on the medication cards in the CB1 Medical patient portal, so browsing doesn't need a second
+tab and a manual search for every product.
 
 Each card gains a small badge above its title:
 
@@ -12,44 +12,55 @@ Each card gains a small badge above its title:
 | Not yet rated | Matched a MedBud page, but nobody has rated it yet. |
 | No MedBud entry | No confident match. Hidden by default; enable it in options. |
 
-The average links straight through to the MedBud page for the full reviews and terpene breakdown.
+Hovering shows MedBud's per-category breakdown — Medicinal Effect, Tastes & Terpenes, Trim &
+Uniformity, Freshness — which is usually what decides an order. The average links through to the full
+page for the written reviews.
 
 ## Installing
 
 1. Clone this repository.
-2. Open `chrome://extensions`, enable **Developer mode**.
+2. Open `chrome://extensions` and enable **Developer mode**.
 3. Choose **Load unpacked** and select the repository root.
 
-There is no build step — the extension loads as-is.
-
-### Portal domain
-
-The manifest matches `https://*.cb1medical.com/*`. If the patient portal is served from a different
-domain, change the three `matches` / `host_permissions` entries in `manifest.json` to that origin and
-reload the extension. Nothing else needs to change.
+No build step — the extension loads as-is.
 
 ## How it works
 
-1. On first use the service worker fetches MedBud's full medication index once and caches the ~1,200
-   medication page paths for 24 hours.
-2. The content script finds product cards on the page and reads each card's title.
-3. Titles are matched against the index by token overlap. The THC/CBD code (`T30`, `T7:C7`) has to
-   agree, which is what keeps `LIT WF T30 White Fire` from being confused with `LIT SL T30 Snow Lotus`.
-4. The matched MedBud page is fetched, its average rating read, and the result cached for 12 hours.
+1. The service worker fetches MedBud's medication index once and caches the ~1,200 page paths.
+2. The content script reads each card's product name from its `aria-label`.
+3. Names are matched against the index. The potency (`T30`), the product code (`WF`, `TT-M`) and the
+   strain words all have to agree, which is what stops `LIT WF T30 White Fire` being confused with
+   `LIT SL T30 Snow Lotus`.
+4. The matched page is fetched and its schema.org `AggregateRating` microdata read.
 
-MedBud requests carry credentials, so if you're signed in to MedBud in the same browser that session
-applies. Lookups are capped at four concurrent requests and every result is cached, so a full browse
-page costs a handful of requests per day rather than one per card view.
+MedBud requests carry credentials, so a signed-in MedBud session in the same browser applies. Lookups
+are capped at four concurrent requests and everything is cached, so a browse session costs a handful of
+requests rather than one per card.
+
+### Cache lifetimes
+
+New medications are listed constantly, so nothing is cached for long, and a miss actively chases a
+refresh rather than waiting one out:
+
+| Data | Lifetime |
+| --- | --- |
+| Medication index | 6 hours |
+| Product rating | 6 hours |
+| Successful match | 12 hours |
+| Failed match | 1 hour |
+
+If a product doesn't match and the index is more than 30 minutes old, the index is refetched
+immediately and the match retried once. A strain that appeared on MedBud this morning therefore shows
+up on the next page load rather than after the cache happens to expire. The options page shows the
+index age and offers a manual refresh.
 
 ## Configuration
-
-Open the extension's options page for:
 
 - **Minimum match confidence** — raise it if a card shows the wrong product, lower it if a product you
   know is on MedBud shows *No MedBud entry*.
 - **Show a badge on products with no MedBud entry** — off by default.
 - **Debug logging** — logs matching decisions to the service worker console.
-- **Clear cache** — forces a fresh index and rating fetch.
+- **Refresh now** / **Clear all cached data**.
 
 ## Tests
 
@@ -57,14 +68,19 @@ Open the extension's options page for:
 npm test
 ```
 
-Covers the matcher against real product names taken from the portal's browse grid.
+The matcher is tested against the real 1,091-entry MedBud formulary and all 23 products from a real
+browse page. Eighteen resolve to the correct MedBud page; the other five are genuinely absent from that
+index snapshot and are asserted to produce *no* match, since a wrong rating on a medicine is worse than
+no rating.
 
 ## Caveats
 
-- Both sites are scraped, not consumed through an API. A markup change on either side will break
-  matching; the modules fail loudly rather than silently showing a wrong rating.
-- MedBud has announced that some data will move behind a login for MHRA reasons. If that covers
+- Both sites are scraped, not consumed through an API. The portal is matched on `aria-label`s and
+  MedBud on schema.org microdata, which are the most stable handles each site offers, but a markup
+  change on either side will still break things. Failures are loud rather than silently wrong.
+- MedBud has announced that some data is moving behind a login for MHRA reasons. If that covers
   ratings, sign in to MedBud in the same browser.
-- Ratings are patient opinions collected by a community site, not clinical guidance. They're useful for
+- Ratings are patient opinions collected by a community site, not clinical guidance. Useful for
   narrowing a shortlist, not for deciding what to take — that conversation belongs with your prescriber.
+  MedBud says the same thing on every page it publishes.
 - Not affiliated with, endorsed by, or connected to CB1 Medical or MedBud. Built for personal use.

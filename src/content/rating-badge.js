@@ -1,5 +1,4 @@
-const BADGE_CLASS = "medbud-badge";
-const MAXIMUM_RATING = 5;
+export const BADGE_CLASS = "medbud-badge";
 
 export function createBadge()
 {
@@ -18,6 +17,7 @@ export function applyRating(badge, rating)
 
 	badge.replaceChildren();
 	delete badge.dataset.tier;
+	badge.removeAttribute("title");
 
 	if (!rating.matched)
 	{
@@ -34,9 +34,9 @@ export function applyRating(badge, rating)
 	}
 
 	badge.dataset.state = "rated";
-	badge.dataset.tier = toTier(rating.average);
-	badge.title = `MedBud match confidence ${(rating.matchScore * 100).toFixed(0)}%`;
-	badge.append(buildStars(rating.average), buildLink(rating.url, buildSummary(rating)));
+	badge.dataset.tier = toTier(rating.average, rating.bestRating);
+	badge.title = describeRating(rating);
+	badge.append(buildStars(rating.average, rating.bestRating), buildLink(rating.url, describeSummary(rating)));
 }
 
 export function applyError(badge, reason)
@@ -50,7 +50,7 @@ export function applyError(badge, reason)
 	badge.title = reason?.message ?? String(reason);
 }
 
-function buildStars(average)
+function buildStars(average, bestRating)
 {
 	const stars = document.createElement("span");
 	stars.className = "medbud-badge__stars";
@@ -62,7 +62,7 @@ function buildStars(average)
 	const fill = document.createElement("span");
 	fill.className = "medbud-badge__stars-fill";
 	fill.textContent = "★★★★★";
-	fill.style.width = `${clampPercentage((average / MAXIMUM_RATING) * 100)}%`;
+	fill.style.width = `${clampPercentage((average / bestRating) * 100)}%`;
 
 	stars.append(track, fill);
 
@@ -81,17 +81,28 @@ function buildLink(url, label)
 	return link;
 }
 
-function buildSummary(rating)
+function describeSummary(rating)
 {
-	const ratings = `${rating.ratingCount} rating${rating.ratingCount === 1 ? "" : "s"}`;
-
-	return `${rating.average.toFixed(2)} · ${ratings}`;
+	return `${rating.average.toFixed(2)} · ${rating.ratingCount} rating${rating.ratingCount === 1 ? "" : "s"}`;
 }
 
-function toTier(average)
+// Shown on hover: the per-category breakdown is the part that usually decides
+// whether a product is worth ordering, and it saves opening the page at all.
+function describeRating(rating)
 {
-	if (average >= 4) return "high";
-	if (average >= 3) return "mid";
+	const lines = rating.categories.map(category => `${category.label}: ${category.average.toFixed(1)}`);
+
+	lines.push(`${rating.reviewCount} written review${rating.reviewCount === 1 ? "" : "s"}`);
+
+	return lines.join("\n");
+}
+
+function toTier(average, bestRating)
+{
+	const fraction = average / bestRating;
+
+	if (fraction >= 0.8) return "high";
+	if (fraction >= 0.6) return "mid";
 
 	return "low";
 }

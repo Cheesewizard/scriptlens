@@ -1,31 +1,52 @@
 import { readCached, writeCached } from "./http-cache.js";
+import { describeCandidate } from "./product-matcher.js";
 import { debug } from "../shared/logging.js";
 
 const INDEX_URL = "https://medbud.wiki/strains/";
 const INDEX_CACHE_KEY = "medbud-index";
-const INDEX_TTL_MS = 24 * 60 * 60 * 1000;
+
+// New medications are listed constantly, so the index is short-lived. It costs a
+// single request, and a miss can force a refresh sooner (see rating-service).
+export const INDEX_TTL_MS = 6 * 60 * 60 * 1000;
 
 // Medication pages live at /strains/<brand>/<product>/. Brand landing pages have
-// a single path segment and are excluded by requiring both segments.
+// a single path segment and are excluded by requiring both.
 const PRODUCT_LINK_PATTERN = /href="(?:https:\/\/medbud\.wiki)?(\/strains\/[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*\/)"/gi;
 
-export async function loadProductIndex()
+// Tokenising 1,200 paths is wasted work on every lookup, so the parsed form is
+// held for the life of the service worker and rebuilt whenever the paths change.
+let describedCache = null;
+
+export async function loadIndex({ forceRefresh = false } = {})
 {
-	const cached = await readCached(INDEX_CACHE_KEY);
+	const cached = forceRefresh ? null : await readCached(INDEX_CACHE_KEY);
 	if (cached) return cached;
 
 	const paths = await fetchProductPaths();
+	const index = { paths, fetchedAt: Date.now() };
 
-	await writeCached(INDEX_CACHE_KEY, paths, INDEX_TTL_MS);
+	await writeCached(INDEX_CACHE_KEY, index, INDEX_TTL_MS);
 	debug(`indexed ${paths.length} MedBud medication pages`);
 
-	return paths;
+	return index;
+}
+
+export async function loadCandidates(options)
+{
+	const index = await loadIndex(options);
+
+	if (describedCache?.fetchedAt !== index.fetchedAt)
+	{
+		describedCache = { fetchedAt: index.fetchedAt, candidates: index.paths.map(describeCandidate) };
+	}
+
+	return { candidates: describedCache.candidates, fetchedAt: index.fetchedAt };
 }
 
 async function fetchProductPaths()
 {
-	// Credentials are included so that a logged-in MedBud session is honoured;
-	// MedBud has announced that some data will move behind a login.
+	// Credentials are included so a signed-in MedBud session is honoured; MedBud
+	// has announced that some data is moving behind a login.
 	const response = await fetch(INDEX_URL, { credentials: "include" });
 	if (!response.ok) throw new Error(`MedBud index request failed with status ${response.status}`);
 

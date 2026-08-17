@@ -7,7 +7,7 @@
 		"storage"
 	],
 	"host_permissions": [
-		"https://*.cb1medical.com/*",
+		"https://patient.cb1medical.com/*",
 		"https://medbud.wiki/*"
 	],
 	"background": {
@@ -17,7 +17,7 @@
 	"content_scripts": [
 		{
 			"matches": [
-				"https://*.cb1medical.com/*"
+				"https://patient.cb1medical.com/*"
 			],
 			"js": [
 				"src/content/loader.js"
@@ -35,7 +35,7 @@
 				"src/shared/*.js"
 			],
 			"matches": [
-				"https://*.cb1medical.com/*"
+				"https://patient.cb1medical.com/*"
 			]
 		}
 	],

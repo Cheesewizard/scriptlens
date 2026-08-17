@@ -1,39 +1,49 @@
-const ADD_BUTTON_PATTERN = /\badd to (cart|order|request|basket)\b/i;
-const POTENCY_PATTERN = /\bT\d{1,3}\b/;
-const PRICE_PATTERN = /£\s?\d/;
-const MAX_ANCESTOR_WALK = 8;
+// The portal is React Native Web, so class names are hashed atomic utilities and
+// useless as selectors. Every card does carry accessibility labels, which are
+// stable and give the exact product name without any text scraping:
+//   <div aria-label="LIT WF Smalls T30 White Fire Flower 10g image">
+//   <button aria-label="Add LIT WF Smalls T30 White Fire Flower 10g to request">
+const ADD_BUTTON_SELECTOR = "button[aria-label^='Add '][aria-label$=' to request']";
+const ADD_LABEL_PATTERN = /^Add (.+) to request$/;
+const MAX_ANCESTOR_WALK = 6;
 
-export const PROCESSED_ATTRIBUTE = "data-medbud-processed";
+export const PRODUCT_ATTRIBUTE = "data-medbud-product";
 
-export function findUnprocessedCards(root)
+export function findProductCards(root)
 {
 	if (!root) throw new Error("root is required");
 
-	const cards = new Set();
+	const cards = [];
 
-	for (const control of root.querySelectorAll("button, a, [role='button']"))
+	for (const button of root.querySelectorAll(ADD_BUTTON_SELECTOR))
 	{
-		if (!ADD_BUTTON_PATTERN.test(control.textContent ?? "")) continue;
+		const productName = ADD_LABEL_PATTERN.exec(button.getAttribute("aria-label"))?.[1];
+		if (!productName) continue;
 
-		const card = findCardAncestor(control);
-		if (card && !card.hasAttribute(PROCESSED_ATTRIBUTE)) cards.add(card);
+		const card = findCardAncestor(button, productName);
+		if (!card) continue;
+
+		// The grid recycles DOM nodes when filters or tabs change, so a card that
+		// was already decorated can come back holding a different product. The
+		// recorded name is what tells the two cases apart.
+		if (card.getAttribute(PRODUCT_ATTRIBUTE) === productName) continue;
+
+		cards.push({ card, productName });
 	}
 
-	return [...cards];
+	return cards;
 }
 
-// The portal ships hashed class names, so a card is identified by shape instead:
-// the nearest ancestor of an add-to-cart control that also holds a potency code
-// and a price is the product tile.
-function findCardAncestor(control)
+// The card root is the nearest ancestor of the button that also holds the
+// product image, which self-validates the match via the same product name.
+function findCardAncestor(button, productName)
 {
-	let element = control.parentElement;
+	const imageSelector = `[aria-label="${CSS.escape(productName)} image"]`;
+	let element = button.parentElement;
 
 	for (let depth = 0; element && depth < MAX_ANCESTOR_WALK; depth += 1)
 	{
-		const text = element.textContent ?? "";
-
-		if (POTENCY_PATTERN.test(text) && PRICE_PATTERN.test(text)) return element;
+		if (element.querySelector(imageSelector)) return element;
 
 		element = element.parentElement;
 	}
@@ -41,25 +51,15 @@ function findCardAncestor(control)
 	return null;
 }
 
-export function findTitleElement(card)
+export function findTitleElement(card, productName)
 {
 	if (!card) throw new Error("card is required");
+	if (!productName) throw new Error("productName is required");
 
-	let best = null;
-
-	for (const element of card.querySelectorAll("*"))
+	for (const element of card.querySelectorAll("div[dir='auto']"))
 	{
-		const text = (element.textContent ?? "").trim();
-
-		if (text.length === 0) continue;
-		if (!POTENCY_PATTERN.test(text)) continue;
-		if (text.includes("£") || text.includes("%")) continue;
-		if (ADD_BUTTON_PATTERN.test(text)) continue;
-
-		// The shortest qualifying text belongs to the deepest element, which is
-		// the title node rather than one of its wrappers.
-		if (best === null || text.length < best.text.length) best = { element, text };
+		if (element.textContent.trim() === productName) return element;
 	}
 
-	return best;
+	return null;
 }

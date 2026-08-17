@@ -7,6 +7,7 @@ const minimumMatchScoreInput = document.getElementById("minimumMatchScore");
 const minimumMatchScoreValue = document.getElementById("minimumMatchScoreValue");
 const showUnmatchedProductsInput = document.getElementById("showUnmatchedProducts");
 const debugLoggingInput = document.getElementById("debugLogging");
+const refreshIndexButton = document.getElementById("refreshIndex");
 const clearCacheButton = document.getElementById("clearCache");
 const statusText = document.getElementById("status");
 const feedbackText = document.getElementById("feedback");
@@ -28,9 +29,10 @@ async function initialise()
 	minimumMatchScoreInput.addEventListener("change", persist);
 	showUnmatchedProductsInput.addEventListener("change", persist);
 	debugLoggingInput.addEventListener("change", persist);
+	refreshIndexButton.addEventListener("click", handleRefreshIndex);
 	clearCacheButton.addEventListener("click", handleClearCache);
 
-	await refreshStatus();
+	await renderStatus(MESSAGE_TYPES.GET_STATUS);
 }
 
 function renderMatchScore()
@@ -49,27 +51,68 @@ async function persist()
 	showFeedback("Saved.");
 }
 
+async function handleRefreshIndex()
+{
+	refreshIndexButton.disabled = true;
+	statusText.textContent = "Refreshing…";
+
+	await renderStatus(MESSAGE_TYPES.REFRESH_INDEX);
+
+	refreshIndexButton.disabled = false;
+	showFeedback("Index refreshed.");
+}
+
 async function handleClearCache()
 {
 	const response = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.CLEAR_CACHE });
 
 	if (!response?.ok)
 	{
-		showFeedback(`Could not clear the cache: ${response?.reason ?? "unknown error"}`);
+		showFeedback(`Could not clear the cache: ${response.reason}`);
 		return;
 	}
 
 	showFeedback(`Cleared ${response.result.removedEntries} cached entries.`);
-	await refreshStatus();
+	await renderStatus(MESSAGE_TYPES.GET_STATUS);
 }
 
-async function refreshStatus()
+async function renderStatus(messageType)
 {
-	const response = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.GET_STATUS });
+	const response = await chrome.runtime.sendMessage({ type: messageType });
 
-	statusText.textContent = response?.ok
-		? `${response.result.indexedProducts} MedBud medications indexed.`
-		: `MedBud index unavailable: ${response?.reason ?? "unknown error"}`;
+	if (!response?.ok)
+	{
+		statusText.textContent = `MedBud index unavailable: ${response.reason}`;
+		return;
+	}
+
+	const { indexedProducts, fetchedAt, expiresAt } = response.result;
+
+	statusText.textContent = `${indexedProducts} medications indexed ${describeAge(fetchedAt)}. Refreshes automatically ${describeDue(expiresAt)}.`;
+}
+
+function describeAge(timestamp)
+{
+	const minutes = Math.round((Date.now() - timestamp) / 60000);
+
+	if (minutes < 1) return "just now";
+	if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+
+	const hours = Math.round(minutes / 60);
+
+	return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+}
+
+function describeDue(timestamp)
+{
+	const minutes = Math.round((timestamp - Date.now()) / 60000);
+
+	if (minutes <= 0) return "on the next lookup";
+	if (minutes < 60) return `in ${minutes} minute${minutes === 1 ? "" : "s"}`;
+
+	const hours = Math.round(minutes / 60);
+
+	return `in ${hours} hour${hours === 1 ? "" : "s"}`;
 }
 
 function showFeedback(message)

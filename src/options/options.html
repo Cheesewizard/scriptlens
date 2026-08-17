@@ -17,7 +17,7 @@
 					<output id="minimumMatchScoreValue"></output>
 				</label>
 				<input id="minimumMatchScore" type="range" min="0.2" max="1" step="0.05">
-				<p class="hint">Raise this if the wrong medication is being matched; lower it if familiar products show no entry.</p>
+				<p class="hint">Raise this if the wrong medication is matched; lower it if familiar products show no entry.</p>
 
 				<label class="checkbox">
 					<input id="showUnmatchedProducts" type="checkbox">
@@ -31,9 +31,12 @@
 			</section>
 
 			<section>
-				<h2>Cached MedBud data</h2>
-				<p id="status" class="hint">Loading…</p>
-				<button id="clearCache" type="button">Clear cache</button>
+				<h2>MedBud index</h2>
+				<p id="status" class="hint">Loading&hellip;</p>
+				<div class="actions">
+					<button id="refreshIndex" type="button">Refresh now</button>
+					<button id="clearCache" type="button" class="secondary">Clear all cached data</button>
+				</div>
 			</section>
 
 			<p id="feedback" class="feedback" role="status"></p>

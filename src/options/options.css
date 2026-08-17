@@ -84,3 +84,22 @@ button:hover {
 	font-size: 13px;
 	color: #6ee7b7;
 }
+
+.actions {
+	display: flex;
+	gap: 10px;
+}
+
+button.secondary {
+	border-color: #3a2b2b;
+	background: #241c1c;
+}
+
+button.secondary:hover {
+	background: #2f2323;
+}
+
+button:disabled {
+	opacity: 0.5;
+	cursor: default;
+}

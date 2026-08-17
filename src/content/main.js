@@ -1,5 +1,5 @@
-import { findUnprocessedCards, findTitleElement, PROCESSED_ATTRIBUTE } from "./card-scanner.js";
-import { createBadge, applyRating, applyError } from "./rating-badge.js";
+import { findProductCards, findTitleElement, PRODUCT_ATTRIBUTE } from "./card-scanner.js";
+import { createBadge, applyRating, applyError, BADGE_CLASS } from "./rating-badge.js";
 import { MESSAGE_TYPES } from "../shared/messages.js";
 import { loadSettings } from "../shared/settings.js";
 import { warn } from "../shared/logging.js";
@@ -31,30 +31,41 @@ function watchSettings()
 
 function scan()
 {
-	for (const card of findUnprocessedCards(document))
+	for (const { card, productName } of findProductCards(document))
 	{
-		card.setAttribute(PROCESSED_ATTRIBUTE, "true");
-		decorate(card);
+		card.setAttribute(PRODUCT_ATTRIBUTE, productName);
+		decorate(card, productName);
 	}
 }
 
-async function decorate(card)
+async function decorate(card, productName)
 {
-	const title = findTitleElement(card);
+	const title = findTitleElement(card, productName);
 
 	if (!title)
 	{
-		warn("no medication title found inside product card", card);
+		warn(`no title element found for "${productName}"`, card);
 		return;
 	}
 
+	// A recycled card may still be showing the previous product's badge.
+	card.querySelector(`.${BADGE_CLASS}`)?.remove();
+
 	const badge = createBadge();
-	title.element.parentElement.insertBefore(badge, title.element);
+	title.parentElement.insertBefore(badge, title);
 
 	try
 	{
-		const response = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.REQUEST_RATING, title: title.text });
+		const response = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.REQUEST_RATING, productName });
 		if (!response?.ok) throw new Error(response?.reason ?? "background lookup failed");
+
+		// The card may have been recycled into a different product while the
+		// lookup was in flight, in which case this result is no longer hers.
+		if (card.getAttribute(PRODUCT_ATTRIBUTE) !== productName)
+		{
+			badge.remove();
+			return;
+		}
 
 		if (!response.result.matched && !settings.showUnmatchedProducts)
 		{
