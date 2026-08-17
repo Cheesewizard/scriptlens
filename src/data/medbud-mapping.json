@@ -1,0 +1,7 @@
+{
+	"version": 1,
+	"note": "CB1 product name to MedBud medication path, for products the matcher cannot resolve. Shared across all users: the portal's catalogue is the same for everyone, so each entry is resolved once rather than once per user. Extend with tools/make-mapping.mjs.",
+	"products": {
+		"Aurora Pedanios SRD T29 Sourdough Flower 10g": "/strains/aurora-pedanios/pedanios-t29/"
+	}
+}

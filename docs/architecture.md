@@ -128,6 +128,34 @@ Refreshing the formulary means shipping a new version of the extension. That is 
 fetching it at runtime is what Cloudflare refuses, and a stale snapshot plus a search fallback works,
 where a live index works not at all.
 
+## The shared mapping
+
+Every patient sees the same catalogue — 84 products across the portal's four tabs at the time of
+writing — so resolving a medication is not per-user work. `product-mapping.js` holds a
+name-to-medication mapping that ships with the extension and optionally refreshes from a URL once a
+day. One resolution serves everybody.
+
+This is the tier that scales. A per-user search key does not survive a public release: users will not
+obtain one, and a key embedded in the extension is extracted immediately and billed to whoever shipped
+it. With a shared mapping, the client makes one small request a day regardless of how many cards are on
+screen, and the lookup volume is bounded by how fast CB1's catalogue turns over — a few hundred new
+medications a year across the entire userbase — rather than by user count.
+
+The mapping only carries what the matcher cannot resolve, since anything the formulary already places
+needs no entry. Remote entries override bundled ones per key, so a wrong link can be corrected without
+shipping a new version, and anything the remote omits still resolves from the bundled copy. A remote
+mapping that parses to nothing usable is refused rather than allowed to blank the bundled one, and
+every path is validated before use — a mapping is remote input, and a bad entry would put a card on the
+wrong medication.
+
+Resolution order is cheapest-first: shared mapping, then the local matcher, then a search on hover.
+
+The gap this exposes: the shipped formulary is scraped from `/strains/`, which is flower only, so the
+portal's vape, oil and pastille tabs resolve almost nothing locally — 34 of 40 flower products against
+roughly 1 of 44 everything else. MedBud keeps those in separate sections. Because the mapping is just
+name to path, covering them is a matter of adding entries and widening the path validation beyond
+`/strains/`, not of teaching the matcher three more naming schemes.
+
 ## Resolving the rest
 
 Roughly one card in six is a medication the formulary cannot place — renamed, or listed since the

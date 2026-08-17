@@ -1,6 +1,7 @@
 import { readCached, writeCached } from "./http-cache.js";
 import { loadCandidates } from "./medbud-index.js";
 import { loadProductRating } from "./medbud-product.js";
+import { lookUpMapping } from "./product-mapping.js";
 import { findBestMatch } from "./product-matcher.js";
 import { enqueue } from "./request-queue.js";
 import { productUrl, searchUrl } from "../shared/medbud-link.js";
@@ -65,6 +66,18 @@ async function resolveMatch(productName, settings)
 	const cacheKey = `match:${productName}`;
 	const cached = await readCached(cacheKey);
 	if (cached) return cached;
+
+	// The shared mapping first: it holds the medications the matcher cannot
+	// resolve, already answered once on everyone's behalf, and costs no lookup.
+	const mapped = await lookUpMapping(productName, settings.mappingUrl);
+
+	if (mapped !== null)
+	{
+		const resolved = { path: mapped, score: 1 };
+		await writeCached(cacheKey, resolved, MATCH_TTL_MS);
+
+		return resolved;
+	}
 
 	const index = await loadCandidates({ live: settings.liveRatings });
 
