@@ -36,6 +36,13 @@ if (!grid) throw new Error("no common ancestor for the cards");
 // Dark Reader and similar extensions inject large style blocks into saved pages.
 for (const style of grid.querySelectorAll("style")) style.remove();
 
+// A page saved while this extension was running carries its own badges and
+// title links. The fixture has to be the portal's markup alone, or the scanner
+// tests would be reading output they themselves produced.
+for (const badge of grid.querySelectorAll(".medbud-badge")) badge.remove();
+for (const link of grid.querySelectorAll(".medbud-title-link")) link.replaceWith(...link.childNodes);
+for (const decorated of grid.querySelectorAll("[data-medbud-product]")) decorated.removeAttribute("data-medbud-product");
+
 const html = `<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><title>CB1 browse grid fixture</title></head>
