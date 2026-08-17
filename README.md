@@ -65,6 +65,10 @@ index age and offers a manual refresh.
 ## Tests
 
 ```
+npm install
+```
+
+```
 npm test
 ```
 
@@ -72,6 +76,20 @@ The matcher is tested against the real 1,091-entry MedBud formulary and all 23 p
 browse page. Eighteen resolve to the correct MedBud page; the other five are genuinely absent from that
 index snapshot and are asserted to produce *no* match, since a wrong rating on a medicine is worse than
 no rating.
+
+The card scanner is tested against the real card grid, so a portal reskin fails the suite rather than
+being discovered on the site. `linkedom` provides the DOM as a `devDependency`; the extension itself
+ships with no runtime dependencies.
+
+Fixtures are regenerated from a saved browse page with:
+
+```
+node tools/make-card-fixture.mjs "path/to/Browse - CB1 Medical.html"
+```
+
+A saved browse page carries your name and your prescription balances. The tool copies only the card
+grid and refuses to write a fixture that still contains any of it — but don't commit the saved page
+itself.
 
 ## Caveats
 

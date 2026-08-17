@@ -86,6 +86,46 @@ One shortcut sits above the scoring: if both sides collapse to an identical run 
 the same product. CB1 writes `L.A. S.A.G.E.` where MedBud writes `la-sage`; these tokenise completely
 differently but both compact to `ipslast26lasage`.
 
+## Testing
+
+The scoring and microdata parsing are pure functions and are tested directly. `card-scanner.js` is not
+— it needs a DOM — and it is also the module most exposed to a portal reskin, so it is tested against
+the real card grid rather than hand-written markup that would drift from the site.
+
+`linkedom` supplies the DOM. It was chosen over `jsdom` because these tests only need
+`querySelectorAll`, `contains` and attributes; jsdom brings a much larger dependency tree for
+spec areas — layout, events, navigation — that never come up here. It is a `devDependency`; the
+extension itself still ships with no runtime dependencies.
+
+linkedom does not implement `CSS`, which `card-scanner` uses to build its attribute selector, so
+`tests/helpers/dom.mjs` installs the CSSOM-spec `CSS.escape` rather than an approximation — otherwise
+the tests would exercise different escaping to production.
+
+That escaping is load-bearing and worth not "simplifying" away. `CSS.escape` escapes for use as an
+*identifier*, and the selector interpolates it inside a quoted attribute value, which looks wrong:
+
+```
+"4C Labs Core ACB T21 …"  ->  [aria-label="\34 C\ Labs\ Core\ ACB\ T21\ … image"]
+"… Creamy Kees #5 …"      ->  [aria-label="…Creamy\ Kees\ \#5\ … image"]
+```
+
+CSS string escapes resolve those back to the original characters, so it matches — verified in Chrome
+against all 23 cards, not just in linkedom. It also correctly escapes a `"` or `\` in a product name,
+which is the case that would otherwise break the selector.
+
+### Fixtures
+
+`tests/fixtures/cb1-browse-grid.html` is the real card grid, extracted from a saved browse page by
+`tools/make-card-fixture.mjs`. Regenerate it by saving the browse page and re-running that tool.
+
+The saved page is a **patient** page: it carries the account holder's name and their live prescription
+balances. Only the grid subtree is copied, which leaves that data behind, and the tool refuses to write
+a fixture that still matches any of it. Do not commit a raw saved page.
+
+`medbud-rating-fragment.html` is a trimmed capture of a live medication page. The parser produces
+identical output on the trimmed fragment and on the full 2.5 MB page, including the `{0,600}` window on
+the aggregate block, so the trimming does not flatter it.
+
 ## Caching
 
 | Data | TTL | Reason |
