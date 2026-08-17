@@ -61,7 +61,11 @@ export function applyBlocked(badge, reason)
 	delete badge.dataset.tier;
 	badge.dataset.state = "blocked";
 	badge.title = reason ?? "MedBud is challenging automated requests.";
-	badge.append(buildLink("https://medbud.wiki/", "MedBud check needed"));
+
+	// The medication index, not the home page: it is the request that is actually
+	// being blocked, so loading it either clears the check or shows that the
+	// browser is not the thing being challenged.
+	badge.append(buildLink("https://medbud.wiki/strains/", "MedBud check needed"));
 }
 
 function buildStars(average, bestRating)
