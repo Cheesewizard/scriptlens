@@ -1,0 +1,86 @@
+:root {
+	color-scheme: dark;
+}
+
+body {
+	margin: 0;
+	padding: 32px;
+	background: #101413;
+	font-family: system-ui, sans-serif;
+	color: #e6ebe9;
+}
+
+main {
+	max-width: 520px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 28px;
+}
+
+h1 {
+	margin: 0;
+	font-size: 20px;
+}
+
+h2 {
+	margin: 0 0 12px;
+	font-size: 14px;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: #8fa39c;
+}
+
+section {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 20px;
+	border: 1px solid #23302c;
+	border-radius: 10px;
+	background: #161c1a;
+}
+
+label {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 14px;
+}
+
+label.checkbox {
+	justify-content: flex-start;
+	gap: 10px;
+}
+
+input[type="range"] {
+	width: 100%;
+}
+
+button {
+	align-self: flex-start;
+	padding: 8px 14px;
+	border: 1px solid #2f4740;
+	border-radius: 6px;
+	background: #1e2a26;
+	color: inherit;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+button:hover {
+	background: #26352f;
+}
+
+.hint {
+	margin: 0;
+	font-size: 12px;
+	color: #8fa39c;
+}
+
+.feedback {
+	margin: 0;
+	min-height: 18px;
+	font-size: 13px;
+	color: #6ee7b7;
+}

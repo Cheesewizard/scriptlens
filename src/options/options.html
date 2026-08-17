@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>CB1 x MedBud Ratings</title>
+		<link rel="stylesheet" href="options.css">
+	</head>
+	<body>
+		<main>
+			<h1>CB1 &times; MedBud Ratings</h1>
+
+			<section>
+				<h2>Matching</h2>
+
+				<label for="minimumMatchScore">
+					Minimum match confidence
+					<output id="minimumMatchScoreValue"></output>
+				</label>
+				<input id="minimumMatchScore" type="range" min="0.2" max="1" step="0.05">
+				<p class="hint">Raise this if the wrong medication is being matched; lower it if familiar products show no entry.</p>
+
+				<label class="checkbox">
+					<input id="showUnmatchedProducts" type="checkbox">
+					Show a badge on products with no MedBud entry
+				</label>
+
+				<label class="checkbox">
+					<input id="debugLogging" type="checkbox">
+					Log matching decisions to the service worker console
+				</label>
+			</section>
+
+			<section>
+				<h2>Cached MedBud data</h2>
+				<p id="status" class="hint">Loading…</p>
+				<button id="clearCache" type="button">Clear cache</button>
+			</section>
+
+			<p id="feedback" class="feedback" role="status"></p>
+		</main>
+
+		<script type="module" src="options.js"></script>
+	</body>
+</html>

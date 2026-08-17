@@ -1,0 +1,46 @@
+{
+	"manifest_version": 3,
+	"name": "CB1 x MedBud Ratings",
+	"version": "0.1.0",
+	"description": "Shows MedBud.wiki patient ratings inline on medication cards in the CB1 Medical patient portal.",
+	"permissions": [
+		"storage"
+	],
+	"host_permissions": [
+		"https://*.cb1medical.com/*",
+		"https://medbud.wiki/*"
+	],
+	"background": {
+		"service_worker": "src/background/service-worker.js",
+		"type": "module"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://*.cb1medical.com/*"
+			],
+			"js": [
+				"src/content/loader.js"
+			],
+			"css": [
+				"src/content/badge.css"
+			],
+			"run_at": "document_idle"
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"src/content/*.js",
+				"src/shared/*.js"
+			],
+			"matches": [
+				"https://*.cb1medical.com/*"
+			]
+		}
+	],
+	"options_ui": {
+		"page": "src/options/options.html",
+		"open_in_tab": true
+	}
+}
