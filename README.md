@@ -1,63 +1,62 @@
 # ScriptLens
 
 A browser extension that links every medication in the CB1 Medical patient portal to its
-[MedBud](https://medbud.wiki) patient reviews and its [Leafly](https://www.leafly.com) strain profile —
-so browsing doesn't need a second tab and a manual search for every product.
+[MedBud](https://medbud.wiki) patient reviews and its [Leafly](https://www.leafly.com) strain profile.
+No more opening a second tab and searching for each product by hand.
 
-Free, open source, and unaffiliated with CB1 Medical, MedBud or Leafly. Runs entirely in your browser;
-no analytics, no account, and no personal or medical data ever leaves it ([privacy policy](PRIVACY.md)).
+It's free, open source, and not affiliated with CB1 Medical, MedBud or Leafly. It runs entirely in your
+browser. There's no analytics, no account, and no personal or medical data ever leaves it (see the
+[privacy policy](PRIVACY.md)).
 
-Each card gains a small **View on MedBud** button above its title — one behaviour, one label. Almost
-always it opens the medication's exact MedBud page; for the occasional product MedBud has renamed or not
-yet listed, the same button runs a search that lands on it, with nothing on the card to distinguish the
-two.
+Every card gets a small **View on MedBud** button above its title. Most of the time it opens the
+medication's exact MedBud page. If MedBud has renamed a product or hasn't listed it yet, the button runs
+a search that lands on it instead, and the card looks the same either way.
 
-Flower cards carry a second button, **Leafly**, to the strain's terpene and effect profile. MedBud is
-the patient reviews; Leafly is the strain data. Leafly is organised by strain rather than by product and
-its naming does not follow from a CB1 name, so this link runs a search scoped to Leafly's strain pages
-rather than guessing a URL that would usually be wrong.
+Flower cards get a second button, **Leafly**, for the strain's terpene and effect profile. MedBud has
+the patient reviews, Leafly has the strain data. Leafly names its strains differently from CB1, so that
+link runs a search scoped to Leafly's strain pages rather than guessing a URL that would usually be
+wrong.
 
-The extension only ever offers a **link** — it does not fetch reviews or ratings and show them on the
-card. Reading MedBud's rating data programmatically would need MedBud's permission, and their pages are
-behind bot protection that refuses it anyway. So ScriptLens takes you to the reviews rather than
-scraping them.
+The extension only ever gives you a link. It doesn't fetch reviews or ratings to show on the card.
+Reading MedBud's ratings automatically would need their permission, and their pages block automated
+requests anyway, so ScriptLens sends you to the reviews instead of scraping them.
 
 ## Installing
 
-Until it is on the Chrome Web Store, load it unpacked (works in Chrome, Brave, Edge and other
-Chromium browsers):
+Until it's on the Chrome Web Store, load it unpacked. This works in Chrome, Brave, Edge and other
+Chromium browsers.
 
 1. Download this repository (**Code → Download ZIP**, or clone it) and unzip it.
-2. Open `chrome://extensions` and enable **Developer mode**.
-3. Choose **Load unpacked** and select the folder.
+2. Open `chrome://extensions` and turn on **Developer mode**.
+3. Click **Load unpacked** and pick the folder.
 
-No build step — the extension loads as-is.
+There's no build step. It loads as-is.
 
 ## How it works
 
 1. A snapshot of MedBud's formulary (1,162 medications) ships in `src/data/medbud-index.json`.
 2. The content script reads each card's product name from its `aria-label`.
-3. Names are matched against the formulary. The potency (`T30`), the product code (`WF`, `TT-M`) and
-   the strain words all have to agree, which is what stops `LIT WF T30 White Fire` being confused with
-   `LIT SL T30 Snow Lotus`.
+3. Names are matched against the formulary. The potency (`T30`), the product code (`WF`, `TT-M`) and the
+   strain words all have to agree. That's what stops `LIT WF T30 White Fire` matching `LIT SL T30 Snow
+   Lotus`.
 4. A confident match links to that medication's page. Anything else links to a search restricted to
-   MedBud, which is what finds a medication listed since the snapshot, or renamed.
+   MedBud, which still finds products that were renamed or listed after the snapshot.
 
-The fallback is the common path, not an edge case. Stock rotates constantly and MedBud renames
-medications: CB1's `Aurora Pedanios SRD T29 Sourdough` is MedBud's `Aurora SRD-CA T29 Sourdough` at
-`/strains/aurora-pedanios/pedanios-t29/` — a slug with neither the product code nor the strain name in
-it. No token matcher resolves that; a search does.
+The search fallback is normal, not a rare edge case. Stock rotates constantly and MedBud renames things.
+CB1's `Aurora Pedanios SRD T29 Sourdough` lives at MedBud's `/strains/aurora-pedanios/pedanios-t29/`, a
+slug with neither the product code nor the strain name in it. No token matcher can resolve that. A
+search can.
 
-Each resolved link is cached so it is not recomputed on every page load: a match for 12 hours, a
-fallback for 1 hour (the likeliest reason for a miss is a medication MedBud has only just listed).
+Each resolved link is cached so it isn't recomputed on every page load: a match for 12 hours, a fallback
+for 1 hour (a miss usually means a medication MedBud only just listed).
 
 ## Configuration
 
-- **Minimum match confidence** — raise it if a card shows the wrong medication, lower it if a familiar
+- **Minimum match confidence.** Raise it if a card shows the wrong medication. Lower it if a familiar
   product falls back to a search.
-- **Show a search link on products the bundled formulary does not list** — on by default.
-- **Debug logging** — logs matching decisions to the service worker console.
-- **Clear all cached data**.
+- **Show a search link on products the bundled formulary doesn't list.** On by default.
+- **Debug logging.** Logs matching decisions to the service worker console.
+- **Clear all cached data.**
 
 ## Tests
 
@@ -69,44 +68,42 @@ npm install
 npm test
 ```
 
-The matcher is tested against the formulary the extension actually ships — 1,162 medications — and a
-real browse page. Products genuinely absent from the formulary are asserted to produce *no* match,
-since a wrong medication is worse than none, and the two wrong matches an earlier, looser potency rule
-produced against live stock are kept as regression tests.
+The matcher is tested against the formulary the extension actually ships (1,162 medications) and a real
+browse page. Products that genuinely aren't in the formulary are asserted to produce no match, because a
+wrong medication is worse than none. Two wrong matches that an earlier, looser potency rule produced
+against real stock are kept as regression tests.
 
-The card scanner is tested against the real card grid, so a portal reskin fails the suite rather than
-being discovered on the site. `linkedom` provides the DOM as a `devDependency`; the extension itself
-ships with no runtime dependencies.
+The card scanner is tested against the real card grid, so a portal redesign fails the test suite instead
+of being found out on the live site. `linkedom` provides the DOM as a `devDependency`. The extension
+itself ships with no runtime dependencies.
 
-Fixtures are regenerated from a saved browse page with:
+Regenerate the fixtures from a saved browse page:
 
 ```
 node tools/make-card-fixture.mjs "path/to/Browse - CB1 Medical.html"
 ```
 
-A saved browse page carries your name and your prescription balances. The tool copies only the card
-grid and refuses to write a fixture that still contains any of it — but don't commit the saved page
-itself.
+A saved browse page has your name and prescription balances on it. The tool copies only the card grid
+and refuses to write a fixture that still contains any of that. Don't commit the saved page itself.
 
 ## Keeping it current
 
-The data is a frozen snapshot — nothing self-updates. When CB1 rotates stock or either site reskins,
-[docs/MAINTENANCE.md](docs/MAINTENANCE.md) has the symptom-to-fix table and the exact refresh recipes.
+The data is a frozen snapshot and nothing updates itself. When CB1 rotates stock or either site gets
+redesigned, [docs/MAINTENANCE.md](docs/MAINTENANCE.md) has a symptom-to-fix table and the refresh steps.
 
 ## Support
 
-ScriptLens is free and maintained in spare time. If it saves you time, you can
-[sponsor its upkeep](https://github.com/sponsors/Cheesewizard) — entirely optional, and it stays free
-either way. Changes are logged in [CHANGELOG.md](CHANGELOG.md).
+ScriptLens is free and maintained in spare time. If it saves you time you can
+[sponsor its upkeep](https://github.com/sponsors/Cheesewizard). It's optional and stays free either way.
+Changes are logged in [CHANGELOG.md](CHANGELOG.md).
 
 ## Caveats
 
-- The portal is read from `aria-label`s, the most stable handle it offers, but a reskin will still
-  break things. Failures are loud rather than silently wrong.
-- The formulary ships with the extension and does not update itself, so newly listed medications fall
-  back to a search until it is refreshed (see [docs/MAINTENANCE.md](docs/MAINTENANCE.md)).
-- Ratings on MedBud are patient opinions collected by a community site, not clinical guidance. Useful
-  for narrowing a shortlist, not for deciding what to take — that conversation belongs with your
-  prescriber.
+- The portal is read from `aria-label`s, the most stable handle it offers, but a redesign can still
+  break things. When it breaks it breaks loudly rather than going silently wrong.
+- The formulary ships with the extension and doesn't update itself, so newly listed medications fall back
+  to a search until it's refreshed (see [docs/MAINTENANCE.md](docs/MAINTENANCE.md)).
+- Ratings on MedBud are patient opinions from a community site, not clinical guidance. They're useful for
+  narrowing a shortlist, not for deciding what to take. That's a conversation for your prescriber.
 - Not affiliated with, endorsed by, or connected to CB1 Medical, MedBud or Leafly. Built for personal
   use.
