@@ -27,6 +27,8 @@ content-side code use normal imports. That is why `src/content/*.js` and `src/sh
 | `content/card-scanner.js` | Locates product cards and their titles. |
 | `content/rating-badge.js` | Builds and updates the badge DOM. |
 | `content/title-link.js` | Wraps the product title in a link to its MedBud page. |
+| `shared/strain.js` | Pulls the strain name out of a flower product name. |
+| `shared/leafly-link.js` | Builds the Leafly strain search for that name. |
 | `content/main.js` | Scanning loop and mutation observer. |
 
 ## Reading the CB1 portal
@@ -56,6 +58,21 @@ handler so middle-click, the context menu and "open in new tab" all work; the cl
 propagating because the whole card is clickable in the portal and the name should go to MedBud rather
 than also opening the portal's product page. Recycled cards are unwrapped before redecorating, or a
 card could point at the product it used to show.
+
+## Leafly
+
+Flower cards carry a second link, to the strain's Leafly terpene and effect profile, alongside the
+MedBud review link. It is a different join: MedBud is matched on the product (the full SKU), Leafly on
+the strain alone, pulled out of the product name — the words between the potency and the form, with the
+pack and batch markers dropped (`shared/strain.js`). Only flower gets it, which is where a terpene
+profile is what a buyer reaches for.
+
+The link is a search, not a direct page, and deliberately so: Leafly's naming does not follow from a
+CB1 name — its "White Fire" is `/strains/white-fire-og` — and there is no bundled Leafly index to
+verify a slug against, so a guessed URL would 404 more often than not. A search scoped to
+`leafly.com/strains` lands on the right strain instead. No fetch is made to Leafly; only a link is
+offered, so its bot protection and terms are never engaged. This is the same shape as the whole
+extension: join two sites through their most stable handle, link out, never scrape what is gated.
 
 ## Reading MedBud
 

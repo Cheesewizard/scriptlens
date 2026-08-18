@@ -92,6 +92,16 @@
 	white-space: nowrap;
 }
 
+.medbud-badge__sep {
+	opacity: 0.4;
+}
+
+/* Leafly's brand green, so the second provider is recognisable at a glance
+   without a second badge. */
+.medbud-badge__leafly {
+	color: #6aa84f;
+}
+
 .medbud-badge__link:hover {
 	text-decoration: underline;
 }

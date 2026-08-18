@@ -1,7 +1,9 @@
 import { findProductCards, findTitleElement, PRODUCT_ATTRIBUTE } from "./card-scanner.js";
-import { createBadge, applyRating, applyError, applyBlocked, BADGE_CLASS } from "./rating-badge.js";
+import { createBadge, applyRating, applyError, applyBlocked, appendStrainLink, BADGE_CLASS } from "./rating-badge.js";
 import { linkTitle, unlinkTitles, TITLE_LINK_CLASS } from "./title-link.js";
 import { CHALLENGED_CODE, MESSAGE_TYPES } from "../shared/messages.js";
+import { extractStrain, isFlower } from "../shared/strain.js";
+import { leaflyStrainUrl } from "../shared/leafly-link.js";
 import { loadSettings } from "../shared/settings.js";
 import { warn } from "../shared/logging.js";
 
@@ -97,7 +99,7 @@ async function decorate(card, productName)
 			return;
 		}
 
-		applyRating(badge, response.result);
+		renderBadge(badge, response.result, productName);
 
 		// A product the formulary cannot place gets its real page looked up, but
 		// only once you show interest in it. Resolving all forty on page load
@@ -108,6 +110,19 @@ async function decorate(card, productName)
 	{
 		applyError(badge, reason);
 	}
+}
+
+// The MedBud state plus, for flower, a link to the strain's Leafly profile.
+// Both the first render and the hover upgrade go through here, since applyRating
+// rebuilds the badge and would otherwise drop the Leafly link.
+function renderBadge(badge, result, productName)
+{
+	applyRating(badge, result);
+
+	if (!isFlower(productName)) return;
+
+	const strain = extractStrain(productName);
+	if (strain) appendStrainLink(badge, leaflyStrainUrl(strain));
 }
 
 // Hovering starts the lookup; by the time a click lands it is usually already
@@ -163,7 +178,7 @@ async function lookUpLink(card, title, badge, productName)
 		if (card.getAttribute(PRODUCT_ATTRIBUTE) !== productName) return null;
 
 		linkTitle(title, response.result.url);
-		if (badge.isConnected) applyRating(badge, { matched: true, ratingsFetched: false, url: response.result.url });
+		if (badge.isConnected) renderBadge(badge, { matched: true, ratingsFetched: false, url: response.result.url }, productName);
 
 		return response.result.url;
 	}

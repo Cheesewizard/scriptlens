@@ -18,6 +18,11 @@ page; for the occasional product MedBud has renamed or not yet listed, the same 
 lands on it, with nothing on the card to distinguish the two. The product name itself is a link to the
 same place, so clicking the medication goes straight there.
 
+Flower cards carry a second link, **Leafly**, to the strain's terpene and effect profile. MedBud is the
+patient reviews; Leafly is the strain data. Leafly is organised by strain rather than by product and
+its naming does not follow from a CB1 name, so this link runs a search scoped to Leafly's strain pages
+rather than guessing a URL that would usually be wrong.
+
 Hovering shows MedBud's per-category breakdown — Medicinal Effect, Tastes & Terpenes, Trim &
 Uniformity, Freshness — which is usually what decides an order. The average links through to the full
 page for the written reviews.

@@ -1,4 +1,5 @@
 export const BADGE_CLASS = "medbud-badge";
+export const STRAIN_LINK_CLASS = "medbud-badge__leafly";
 
 export function createBadge()
 {
@@ -74,6 +75,25 @@ export function applyBlocked(badge, reason)
 	// being blocked, so loading it either clears the check or shows that the
 	// browser is not the thing being challenged.
 	badge.append(buildLink("https://medbud.wiki/strains/", "MedBud check needed"));
+}
+
+// A second provider on the same badge: MedBud carries the reviews, Leafly the
+// terpene and effect profile. Appended after the MedBud content rather than
+// built into it, so it survives the same whatever state the MedBud side is in.
+export function appendStrainLink(badge, url)
+{
+	if (!badge) throw new Error("badge is required");
+	if (!url || badge.querySelector(`.${STRAIN_LINK_CLASS}`)) return;
+
+	const separator = document.createElement("span");
+	separator.className = "medbud-badge__sep";
+	separator.setAttribute("aria-hidden", "true");
+	separator.textContent = "·";
+
+	const link = buildLink(url, "Leafly");
+	link.classList.add(STRAIN_LINK_CLASS);
+
+	badge.append(separator, link);
 }
 
 function buildStars(average, bestRating)
