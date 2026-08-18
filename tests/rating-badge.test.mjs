@@ -35,9 +35,10 @@ test("a match with no rating fetched offers the page", () =>
 	assert.equal(link.getAttribute("target"), "_blank");
 });
 
-// Absent from a snapshot usually means renamed or listed since, so the badge
-// offers a search rather than claiming MedBud has no entry.
-test("an unmatched product offers a search", () =>
+// A card whose page has to be found through a search is indistinguishable, to
+// the reader, from one resolved directly: same label, same look. The search is
+// the rare fallback, and the badge does not advertise it as a lesser state.
+test("an unmatched product still reads as a link to MedBud", () =>
 {
 	const element = badge();
 
@@ -45,9 +46,21 @@ test("an unmatched product offers a search", () =>
 
 	const link = element.querySelector("a");
 
-	assert.equal(element.dataset.state, "unmatched");
-	assert.equal(link.textContent, "Find on MedBud");
+	assert.equal(element.dataset.state, "linked");
+	assert.equal(link.textContent, "View on MedBud");
 	assert.match(link.getAttribute("href"), /site%3Amedbud\.wiki/);
+});
+
+test("a matched and an unmatched product are visually identical", () =>
+{
+	const matched = badge();
+	applyRating(matched, { matched: true, ratingsFetched: false, url: "https://medbud.wiki/strains/a/b/" });
+
+	const unmatched = badge();
+	applyRating(unmatched, { matched: false, searchUrl: "https://www.google.com/search?q=x" });
+
+	assert.equal(matched.dataset.state, unmatched.dataset.state);
+	assert.equal(matched.querySelector("a").textContent, unmatched.querySelector("a").textContent);
 });
 
 test("a fetched rating still renders stars and the average", () =>

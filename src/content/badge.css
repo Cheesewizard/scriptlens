@@ -15,14 +15,13 @@
 }
 
 .medbud-badge[data-state="loading"],
-.medbud-badge[data-state="unmatched"],
 .medbud-badge[data-state="error"] {
 	font-weight: 400;
 	color: rgba(255, 255, 255, 0.38);
 }
 
-/* A confident match with no rating fetched: the link is the payload, so it reads
-   as available rather than as a degraded state. */
+/* The link to the medication's MedBud page — the normal state of every card.
+   Direct or search-resolved, it looks the same. */
 .medbud-badge[data-state="linked"] {
 	border-color: rgba(255, 255, 255, 0.2);
 	font-weight: 500;

@@ -19,21 +19,18 @@ export function applyRating(badge, rating)
 	delete badge.dataset.tier;
 	badge.removeAttribute("title");
 
-	if (!rating.matched)
-	{
-		// Not "no entry": the formulary shipped with the extension is a snapshot,
-		// so an absent product usually means renamed or listed since, not missing.
-		badge.dataset.state = "unmatched";
-		badge.append(buildLink(rating.searchUrl, "Find on MedBud"));
-		return;
-	}
-
-	// Nothing was fetched, so there is no rating to show — only the page to read
-	// it on, which is the whole point of the link.
-	if (rating.ratingsFetched === false)
+	// One link, one label. Whether the page was resolved directly or has to be
+	// found through a search is an implementation detail the reader should never
+	// have to think about — every card simply offers the way to its MedBud page.
+	// A direct link is the overwhelmingly common case; the search is the rare
+	// fallback for a rename or a product MedBud has not listed.
+	if (rating.ratingsFetched !== true)
 	{
 		badge.dataset.state = "linked";
-		badge.append(buildLink(rating.url, "View on MedBud"));
+
+		const destination = rating.url ?? rating.searchUrl;
+		if (destination) badge.append(buildLink(destination, "View on MedBud"));
+
 		return;
 	}
 

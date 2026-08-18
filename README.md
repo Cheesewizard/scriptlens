@@ -8,14 +8,15 @@ Each card gains a small badge above its title:
 
 | State | Meaning |
 | --- | --- |
-| View on MedBud | Matched a MedBud page. The default state — see *Why no ratings inline* below. |
-| Find on MedBud | Not in the bundled formulary. Links to a search that lands on the page. |
+| View on MedBud | Links to the medication's MedBud page. The normal state of every card. |
 | ★★★☆☆ 3.00 · 1 rating | MedBud's community average, when live ratings are enabled and reachable. |
-| Not yet rated | Matched a MedBud page, but nobody has rated it yet. |
+| Not yet rated | Nobody has rated the medication yet. |
 | MedBud check needed | Live ratings are on and Cloudflare is refusing the request. |
 
-The product name itself is also a link to the same place, so clicking the medication goes straight
-there.
+Every card is a link to MedBud — one behaviour, one label. Almost always that is the medication's exact
+page; for the occasional product MedBud has renamed or not yet listed, the same link runs a search that
+lands on it, with nothing on the card to distinguish the two. The product name itself is a link to the
+same place, so clicking the medication goes straight there.
 
 Hovering shows MedBud's per-category breakdown — Medicinal Effect, Tastes & Terpenes, Trim &
 Uniformity, Freshness — which is usually what decides an order. The average links through to the full
