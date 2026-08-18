@@ -1,5 +1,5 @@
-// Generates the ScriptLens icons — a green rating star inside a lens ring on a dark
-// rounded square — as PNGs, with no image tooling. Run after changing the design:
+// Generates the ScriptLens icons - a green rating star inside a lens ring on a dark
+// rounded square - as PNGs, with no image tooling. Run after changing the design:
 //   node tools/make-icons.mjs
 import { deflateSync } from "node:zlib";
 import { writeFileSync, mkdirSync } from "node:fs";

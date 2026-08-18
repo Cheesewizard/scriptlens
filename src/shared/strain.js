@@ -4,8 +4,8 @@
 // potency, with the form, weight and batch markers removed.
 //
 // This feeds a search rather than a direct URL, because Leafly's own naming does
-// not follow from a CB1 name — its "White Fire" lives at /strains/white-fire-og
-// — so the extraction only has to be good enough for a search to land, not exact.
+// not follow from a CB1 name - its "White Fire" lives at /strains/white-fire-og
+// - so the extraction only has to be good enough for a search to land, not exact.
 
 const POTENCY_PATTERN = /^[tc]\d{1,3}(:[tc]?\d{1,3})?$/i;
 const WEIGHT_PATTERN = /^\d+(\.\d+)?(g|ml|mg)$/i;

@@ -13,7 +13,7 @@ export function createBadge()
 
 // One link, one label. Whether the page was resolved directly or has to be found
 // through a search is an implementation detail the reader never has to think
-// about — every card simply offers the way to its MedBud page. A direct link is
+// about - every card simply offers the way to its MedBud page. A direct link is
 // the overwhelmingly common case; the search is the rare fallback for a rename
 // or a product MedBud has not listed.
 export function applyRating(badge, result)

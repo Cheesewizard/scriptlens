@@ -6,7 +6,7 @@ import { loadFixture, parseFragment } from "./helpers/dom.mjs";
 
 const GRID = "cb1-browse-grid.html";
 
-// The four portal tabs, with the full product count on each — every card, not
+// The four portal tabs, with the full product count on each - every card, not
 // only the orderable ones. A product that is out of stock or over the patient's
 // THC limit has no "Add to request" button but still shows an image and a title,
 // and the scanner reads it from the image so its reviews are not lost. Keying off

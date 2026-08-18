@@ -1,4 +1,4 @@
-# Chrome Web Store listing — ScriptLens
+# Chrome Web Store listing - ScriptLens
 
 Paste-ready copy for the Web Store submission. Update here, then re-paste, when the listing changes.
 
@@ -26,20 +26,20 @@ English (UK)
 
 ```
 ScriptLens adds a link to patient reviews and strain information next to every medication on the
-CB1 Medical patient portal — so you can check what other patients think of a product without opening
+CB1 Medical patient portal - so you can check what other patients think of a product without opening
 a second tab and searching for it by hand.
 
 WHAT IT DOES
 • On every product card, a "View on MedBud" link takes you straight to that medication's page on
   MedBud.wiki, the UK patient-review community.
 • On flower, a second "Leafly" link opens the strain's terpene and effect profile.
-• Works on all four tabs — flower, oils, vapes and pastilles — and on every product, including ones
+• Works on all four tabs - flower, oils, vapes and pastilles - and on every product, including ones
   that are out of stock or over your prescription limit.
 
 HOW IT WORKS
 ScriptLens ships with a snapshot of MedBud's medication list and matches each product locally. A product
-it recognises links straight to that medication's MedBud page. Any that fail to match — a renamed or
-newly listed product — fall back to a Google search query for the product instead of a direct link,
+it recognises links straight to that medication's MedBud page. Any that fail to match - a renamed or
+newly listed product - fall back to a Google search query for the product instead of a direct link,
 which still lands you on the right page. Nothing is scraped: it only ever offers you a link.
 
 PRIVATE BY DESIGN
@@ -99,9 +99,9 @@ card, so it exposes no name, prescription or allowance data.
 
 For real screenshots, capture these yourself on a browse page (the portal needs a login):
 
-1. A browse grid with several cards showing the **View on MedBud** and **Leafly** links — the core value, one glance.
+1. A browse grid with several cards showing the **View on MedBud** and **Leafly** links - the core value, one glance.
 2. A close-up of a single card with the links.
 3. The settings page.
 
 Blur or crop out the header (your name) and the allowance bar (your prescription balances) before
-uploading — same reason the fixtures strip them.
+uploading - same reason the fixtures strip them.

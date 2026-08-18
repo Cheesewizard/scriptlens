@@ -15,7 +15,7 @@
 
   <!-- illustration tag -->
   <rect x="470" y="58" width="258" height="28" rx="14" fill="#EAEFEA"/>
-  <text x="599" y="77" fill="#7A8A80" font-size="14" text-anchor="middle">Illustration — not a real screenshot</text>
+  <text x="599" y="77" fill="#7A8A80" font-size="14" text-anchor="middle">Illustration, not a real screenshot</text>
 
   <!-- the card -->
   <g filter="url(#cardShadow)">

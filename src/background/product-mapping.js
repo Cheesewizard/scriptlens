@@ -18,7 +18,7 @@ const MINIMUM_USEFUL_ENTRIES = 1;
 let bundledCache = null;
 
 // Resolution order is cheapest-first: the shared mapping, then the local
-// matcher, then a search. This is the tier that scales — it costs one small
+// matcher, then a search. This is the tier that scales - it costs one small
 // request a day however many products are on screen.
 export async function lookUpMapping(productName, mappingUrl)
 {

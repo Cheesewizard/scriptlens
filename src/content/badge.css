@@ -20,7 +20,7 @@
 	color: rgba(255, 255, 255, 0.38);
 }
 
-/* The link to the medication's MedBud page — the normal state of every card.
+/* The link to the medication's MedBud page - the normal state of every card.
    Direct or search-resolved, it looks the same. */
 .medbud-badge[data-state="linked"] {
 	border-color: rgba(255, 255, 255, 0.2);

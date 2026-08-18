@@ -8,7 +8,7 @@ const BUNDLED_INDEX_PATH = "src/data/medbud-index.json";
 let describedCache = null;
 let bundledCache = null;
 
-// The formulary ships with the extension, so matching costs no network at all —
+// The formulary ships with the extension, so matching costs no network at all -
 // nothing is ever fetched from MedBud. The list is a snapshot; refreshing it
 // means shipping a new version of the extension.
 export async function loadIndex()

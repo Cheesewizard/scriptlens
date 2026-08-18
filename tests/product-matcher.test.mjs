@@ -37,7 +37,7 @@ const EXPECTED_MATCHES = new Map([
 
 	// MedBud lists this medication only at T27. CB1 labels the batch it is
 	// selling, so the potencies differ while the brand, product code and strain
-	// all agree — the same medication, resolved by the potency-tolerant pass.
+	// all agree - the same medication, resolved by the potency-tolerant pass.
 	["4C Labs Core ACB T21 Acai Berry Flower 10g", "/strains/4c-labs/acb-t27-acai-berry/"]
 ]);
 

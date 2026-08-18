@@ -37,7 +37,7 @@ test("rejects empty input rather than linking nowhere", () =>
 
 // The bundled formulary is a snapshot and stock rotates, so the fallback is the
 // common path, not an edge case. These are real current products that the
-// matcher does not resolve — the point is that they still lead somewhere.
+// matcher does not resolve - the point is that they still lead somewhere.
 test("products absent from the bundled formulary still resolve to a search", () =>
 {
 	const unmatched = [

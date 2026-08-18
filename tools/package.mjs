@@ -1,4 +1,4 @@
-// Builds the Chrome Web Store upload — dist/scriptlens-<version>.zip — containing
+// Builds the Chrome Web Store upload - dist/scriptlens-<version>.zip - containing
 // only the files the extension needs at runtime. Tests, tools, docs and
 // node_modules are left out. No dependencies; writes the zip by hand.
 //   npm run package
@@ -112,4 +112,4 @@ const zip = buildZip(files);
 mkdirSync(new URL("dist/", ROOT), { recursive: true });
 writeFileSync(new URL(`dist/scriptlens-${version}.zip`, ROOT), zip);
 
-console.log(`wrote dist/scriptlens-${version}.zip — ${files.length} files, ${zip.length} bytes`);
+console.log(`wrote dist/scriptlens-${version}.zip - ${files.length} files, ${zip.length} bytes`);

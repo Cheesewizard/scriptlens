@@ -55,7 +55,7 @@ async function resolveProduct(productName)
 
 async function resolveMatch(productName, { minimumMatchScore, mappingUrl })
 {
-	// The mapping is authoritative and cheap — held in memory after first load —
+	// The mapping is authoritative and cheap - held in memory after first load -
 	// so it is consulted before the cache. A cached miss from before an entry was
 	// added must never shadow it, which is exactly what browsing these tabs before
 	// the mapping existed would otherwise cause.

@@ -5,8 +5,8 @@
 //   node tools/make-card-fixture.mjs "~/Downloads/vape - CB1 Medical.html" cb1-vape-grid.html
 //
 // The saved page is a *patient* page: it carries the account holder's name and
-// their live prescription balances. Only the product cards are copied — each
-// card is the tightest element holding both a product image and its title — so
+// their live prescription balances. Only the product cards are copied - each
+// card is the tightest element holding both a product image and its title - so
 // the surrounding page, where the patient data lives, is left behind entirely.
 // The result is still checked for that data before being written. Never commit
 // the raw saved page.
@@ -39,7 +39,7 @@ globalThis.document = document;
 
 // A page saved while this extension was running carries its own badges and
 // data-medbud-product attributes. Strip them from the whole document *before*
-// scanning — the scanner skips a card already carrying its product attribute
+// scanning - the scanner skips a card already carrying its product attribute
 // (the recycle guard), so leaving them on would drop every decorated card,
 // which is exactly the addable ones.
 for (const style of document.querySelectorAll("style")) style.remove();
@@ -47,7 +47,7 @@ for (const badge of document.querySelectorAll(".medbud-badge")) badge.remove();
 for (const decorated of document.querySelectorAll("[data-medbud-product]")) decorated.removeAttribute("data-medbud-product");
 
 const cards = findProductCards(document).map(({ card }) => card);
-if (cards.length === 0) throw new Error("no product cards found — has the portal markup changed?");
+if (cards.length === 0) throw new Error("no product cards found - has the portal markup changed?");
 
 const html = `<!doctype html>
 <html lang="en">

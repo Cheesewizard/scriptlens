@@ -7,7 +7,7 @@
 // Cards are keyed off the product image, not the "Add to request" button: a
 // product that is out of stock or over the patient's THC limit has no add
 // button but still shows an image, and its reviews are worth just as much. Keying
-// off the button silently hid every such product — the majority of some tabs.
+// off the button silently hid every such product - the majority of some tabs.
 const IMAGE_LABEL_SUFFIX = " image";
 const IMAGE_SELECTOR = "[aria-label$=' image']";
 const MAX_ANCESTOR_WALK = 6;

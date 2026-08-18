@@ -8,19 +8,19 @@ This is a short, plain-English policy for a tool that runs entirely in your brow
 ## What it reads
 
 On the CB1 Medical portal (`patient.cb1medical.com`), ScriptLens reads the **product name** shown on each
-medication card — the text CB1 already puts in the page's accessibility labels. That is all it takes
+medication card - the text CB1 already puts in the page's accessibility labels. That is all it takes
 from the page. It does **not** read, store, or transmit your name, your prescription, your allowances,
 your order history, or anything else about you or your account.
 
 ## What leaves your browser, and where it goes
 
 - **Nothing goes to a ScriptLens server, because there isn't one.**
-- **ScriptLens never fetches anything** — it only ever builds links for you to click. When a product is
+- **ScriptLens never fetches anything** - it only ever builds links for you to click. When a product is
   not in the bundled data, the link is a web search built from the product name (a Google search scoped
   to MedBud, or to Leafly). Navigating there happens only when **you click** the link, exactly as if you
   had typed the name into a search box yourself.
 
-No link ScriptLens builds carries any information about you — only the public name of a medication.
+No link ScriptLens builds carries any information about you - only the public name of a medication.
 
 ## What it stores
 
@@ -30,8 +30,8 @@ that enabled for extensions. You can clear all cached data from the settings pag
 
 ## Permissions
 
-- **Storage** — to keep your settings and the link cache locally.
-- **Access to `patient.cb1medical.com`** — the only site the extension runs on, to read product names
+- **Storage** - to keep your settings and the link cache locally.
+- **Access to `patient.cb1medical.com`** - the only site the extension runs on, to read product names
   and add the links. It requests no other site.
 
 ## Contact

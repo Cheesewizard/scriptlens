@@ -148,7 +148,7 @@ function scoreCandidate(title, candidate, requirePotency)
 // carry the match, or the pass produces confident nonsense: one shared word puts
 // "MD T22 MAC Daddy" on MedBud's "t27-mac-doughnut", and dropping the brand puts
 // "Papers RS-ELV T24 RS-11" on Doja's "rs-11". Requiring every strain word means
-// only a potency difference is forgiven — which is the batch labelling this pass
+// only a potency difference is forgiven - which is the batch labelling this pass
 // exists for, and nothing else.
 function namesSameMedication(title, candidate)
 {

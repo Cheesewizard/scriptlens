@@ -27,7 +27,7 @@ const paths = new Set();
 
 for (const match of html.matchAll(PRODUCT_LINK_PATTERN)) paths.add(match[1].toLowerCase());
 
-if (paths.size === 0) throw new Error("no medication links found — is this the /strains/ page, and did it finish loading before it was saved?");
+if (paths.size === 0) throw new Error("no medication links found - is this the /strains/ page, and did it finish loading before it was saved?");
 
 const previous = JSON.parse(readFileSync(OUTPUT_PATH, "utf8"));
 const sorted = [...paths].sort();
