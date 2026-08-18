@@ -37,10 +37,10 @@ WHAT IT DOES
   that are out of stock or over your prescription limit.
 
 HOW IT WORKS
-ScriptLens ships with a snapshot of MedBud's medication list and matches each product locally, so most
-cards link straight to the exact page. For anything it can't place directly — a renamed or newly listed
-product — the link runs a search that lands on the right page instead. Nothing is scraped: it only ever
-offers you a link.
+ScriptLens ships with a snapshot of MedBud's medication list and matches each product locally. A product
+it recognises links straight to that medication's MedBud page. Any that fail to match — a renamed or
+newly listed product — fall back to a Google search query for the product instead of a direct link,
+which still lands you on the right page. Nothing is scraped: it only ever offers you a link.
 
 PRIVATE BY DESIGN
 ScriptLens runs entirely in your browser. There is no account, no analytics, no tracking, and no server.
