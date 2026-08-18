@@ -73,10 +73,6 @@ built the current mapping:
 Adding mapping entries does **not** need a `RESOLUTION_VERSION` bump — the mapping is checked before the
 cache, so a new entry always wins over a stale miss.
 
-There is also `tools/make-mapping.mjs`, which does step 3 automatically via the Brave Search API
-(`BRAVE_API_KEY=… node tools/make-mapping.mjs "saved-cb1-page.html"`). It is faster but unverified
-against the index, so prefer the grep method for anything you are unsure of.
-
 ### C. A card links to the wrong medication
 
 The one that matters most — a wrong rating on a medicine is worse than none.

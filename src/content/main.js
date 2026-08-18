@@ -85,11 +85,6 @@ async function decorate(card, productName)
 		}
 
 		renderBadge(badge, response.result, productName);
-
-		// A product the formulary cannot place gets its real page looked up, but
-		// only once you hover it. Resolving all forty on page load would spend a
-		// search quota on cards you never look at.
-		if (!response.result.matched) resolveOnInterest(card, badge, productName);
 	}
 	catch (reason)
 	{
@@ -98,8 +93,6 @@ async function decorate(card, productName)
 }
 
 // The MedBud state plus, for flower, a link to the strain's Leafly profile.
-// Both the first render and the hover upgrade go through here, since applyRating
-// rebuilds the badge and would otherwise drop the Leafly link.
 function renderBadge(badge, result, productName)
 {
 	applyRating(badge, result);
@@ -108,46 +101,4 @@ function renderBadge(badge, result, productName)
 
 	const strain = extractStrain(productName);
 	if (strain) appendStrainLink(badge, leaflyStrainUrl(strain));
-}
-
-// Hovering a card resolves its exact MedBud page in the background and swaps the
-// badge's search link for the direct one — so by the time it is clicked it points
-// straight at the medication. Until then the badge already links to a search that
-// finds it, so nothing is lost if the lookup has not finished.
-function resolveOnInterest(card, badge, productName)
-{
-	let started = false;
-
-	const start = () =>
-	{
-		if (started) return;
-
-		started = true;
-		lookUpLink(card, badge, productName);
-	};
-
-	card.addEventListener("pointerenter", start);
-
-	// Touch and keyboard never fire pointerenter, so a tap still triggers it.
-	card.addEventListener("pointerdown", start);
-}
-
-async function lookUpLink(card, badge, productName)
-{
-	try
-	{
-		const response = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.RESOLVE_LINK, productName });
-
-		if (!response?.ok) throw new Error(response?.reason ?? "link lookup failed");
-		if (!response.result.url) return;
-
-		// The card may have been recycled while the lookup was in flight.
-		if (card.getAttribute(PRODUCT_ATTRIBUTE) !== productName) return;
-
-		if (badge.isConnected) renderBadge(badge, { matched: true, ratingsFetched: false, url: response.result.url }, productName);
-	}
-	catch (reason)
-	{
-		warn(`could not resolve a MedBud link for "${productName}"`, reason);
-	}
 }

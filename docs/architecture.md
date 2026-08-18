@@ -186,26 +186,15 @@ fall back to search.
 ## Resolving the rest
 
 Roughly one card in six is a medication the formulary cannot place — renamed, or listed since the
-snapshot. `link-resolver.js` finds those through a search API rather than a token match, because a
-search engine handles a rename that no matcher can: CB1's `Aurora Pedanios SRD T29 Sourdough` is
-MedBud's `/strains/aurora-pedanios/pedanios-t29/`, a slug with neither the product code nor the strain
-name in it.
+snapshot. Those link to a search scoped to MedBud (`shared/medbud-link.js`), because a search engine
+handles a rename no matcher can: CB1's `Aurora Pedanios SRD T29 Sourdough` is MedBud's
+`/strains/aurora-pedanios/pedanios-t29/`, a slug with neither the product code nor the strain name in
+it. Nothing is fetched — a link is offered — so no key, permission or quota is involved. The card looks
+identical to a directly-resolved one; only the href differs.
 
-Brave's Search API is used rather than scraping a results page. Scraping Google is against its terms
-and gets challenged within days, which is the same failure this project already hit from the other
-direction. An API key is a real cost — the extension works without one, it just links to a search you
-finish yourself.
-
-**The search engine is queried, never MedBud.** MedBud is only ever opened by the user clicking the
-resulting link, which is an ordinary navigation. Verified in Brave: resolving a product issues exactly
-one request, to `api.search.brave.com`.
-
-Resolution is triggered by hovering a card, not by page load. Forty cards resolved eagerly would spend
-a day's quota on medications never looked at; hovering is a good signal of intent and buys most of the
-round trip before the click. A click landing on an unfinished lookup opens the tab immediately — inside
-the user gesture, so the popup blocker allows it — and points it at the medication when the lookup
-returns, falling back to the search page after 800 ms. Results cache for a month, since a medication's
-URL does not change; failures for a day, since the usual cause is MedBud not having listed it yet.
+(An earlier version resolved these to exact pages on hover through the Brave Search API, behind a
+user-supplied key. It was removed for release: almost no user obtains a key, the extra host permission
+invited scrutiny, and the plain search fallback covers the case perfectly well.)
 
 ## Cloudflare
 

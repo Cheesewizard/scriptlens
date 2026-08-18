@@ -61,8 +61,6 @@ Live fetching is still in the code behind an off-by-default option, for if MedBu
    `LIT SL T30 Snow Lotus`.
 4. A confident match links to that medication's page. Anything else links to a search restricted to
    MedBud, which is what finds a medication listed since the snapshot, or renamed.
-5. With a Brave Search API key set, that search is done for you: hovering a card looks the medication
-   up, so the name links straight to its page. The search engine is asked, never MedBud.
 
 The fallback is the common path, not an edge case. Stock rotates constantly and MedBud renames
 medications: CB1's `Aurora Pedanios SRD T29 Sourdough` is MedBud's `Aurora SRD-CA T29 Sourdough` at
@@ -90,7 +88,6 @@ index age and offers a manual refresh.
 
 - **Minimum match confidence** — raise it if a card shows the wrong medication, lower it if a familiar
   product falls back to a search.
-- **Brave Search API key** — optional. Turns the search fallback into a direct link, resolved on hover.
 - **Show a search link on products the bundled formulary does not list** — on by default.
 - **Fetch ratings from MedBud** — off by default; currently refused by Cloudflare.
 - **Debug logging** — logs matching decisions to the service worker console.

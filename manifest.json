@@ -14,8 +14,7 @@
 	],
 	"host_permissions": [
 		"https://patient.cb1medical.com/*",
-		"https://medbud.wiki/*",
-		"https://api.search.brave.com/*"
+		"https://medbud.wiki/*"
 	],
 	"background": {
 		"service_worker": "src/background/service-worker.js",

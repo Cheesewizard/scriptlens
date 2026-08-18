@@ -16,17 +16,9 @@ export const DEFAULT_SETTINGS = Object.freeze({
 	showUnmatchedProducts: true,
 
 	// Where to refresh the shared name-to-medication mapping from. The catalogue
-	// is identical for every patient, so one resolution serves everyone and no
-	// user needs a search key of their own. Empty means use only the mapping that
-	// ships with the extension.
+	// is identical for every patient, so one resolution serves everyone. Empty
+	// means use only the mapping that ships with the extension.
 	mappingUrl: "",
-
-	// A Brave Search API key. Without one, a product the formulary does not list
-	// links to a search page you finish by hand; with one, the extension asks the
-	// search API on hover and the card links straight to the medication. The
-	// search engine is queried, never MedBud — MedBud is only ever opened by you
-	// clicking the link.
-	searchApiKey: "",
 
 	debugLogging: false
 });
