@@ -92,12 +92,16 @@ on the CB1 Medical patient portal, so the user can research a product without le
 
 ## Screenshots (need 1–5, 1280×800 or 640×400 PNG)
 
-The portal needs a login, so capture these yourself on a real browse page:
+A ready-made illustration ships in this repo if you'd rather not photograph a logged-in page:
+`docs/preview.svg` (vector source) plus `docs/preview-1280x800.png` and `docs/preview-640x400.png`
+(store-sized, upload-ready). It shows the **View on MedBud** and **Leafly** links on a synthetic sample
+card, so it exposes no name, prescription or allowance data.
 
-1. A browse grid with several cards showing the "View on MedBud · Leafly" badge — the core value, one glance.
-2. A close-up of a single card with the badge.
+For real screenshots, capture these yourself on a browse page (the portal needs a login):
+
+1. A browse grid with several cards showing the **View on MedBud** and **Leafly** links — the core value, one glance.
+2. A close-up of a single card with the links.
 3. The settings page.
 
 Blur or crop out the header (your name) and the allowance bar (your prescription balances) before
 uploading — same reason the fixtures strip them.
-```
