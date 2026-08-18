@@ -2,7 +2,7 @@
 
 ## 1.0.0
 
-First public release, as **BudLens**.
+First public release, as **GreenLens**.
 
 - Adds a **View on MedBud** link to every medication on the CB1 Medical portal — patient reviews without
   a second tab or a copy-paste. Flower cards also get a **Leafly** link to the strain's terpene and
@@ -16,5 +16,5 @@ First public release, as **BudLens**.
   ever leaves your browser. See [PRIVACY.md](PRIVACY.md).
 
 Inline rating numbers are not shown: MedBud is behind bot protection that refuses the extension's
-background requests, so BudLens links to the reviews rather than fetching them. The option to fetch
+background requests, so GreenLens links to the reviews rather than fetching them. The option to fetch
 them is present but off by default, in case that protection relaxes.

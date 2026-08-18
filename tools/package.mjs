@@ -1,4 +1,4 @@
-// Builds the Chrome Web Store upload — dist/budlens-<version>.zip — containing
+// Builds the Chrome Web Store upload — dist/greenlens-<version>.zip — containing
 // only the files the extension needs at runtime. Tests, tools, docs and
 // node_modules are left out. No dependencies; writes the zip by hand.
 //   npm run package
@@ -110,6 +110,6 @@ const files = INCLUDE.flatMap((entry) => collect(entry));
 const zip = buildZip(files);
 
 mkdirSync(new URL("dist/", ROOT), { recursive: true });
-writeFileSync(new URL(`dist/budlens-${version}.zip`, ROOT), zip);
+writeFileSync(new URL(`dist/greenlens-${version}.zip`, ROOT), zip);
 
-console.log(`wrote dist/budlens-${version}.zip — ${files.length} files, ${zip.length} bytes`);
+console.log(`wrote dist/greenlens-${version}.zip — ${files.length} files, ${zip.length} bytes`);

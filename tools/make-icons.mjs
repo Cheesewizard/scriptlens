@@ -1,4 +1,4 @@
-// Generates the BudLens icons — a green rating star inside a lens ring on a dark
+// Generates the GreenLens icons — a green rating star inside a lens ring on a dark
 // rounded square — as PNGs, with no image tooling. Run after changing the design:
 //   node tools/make-icons.mjs
 import { deflateSync } from "node:zlib";
