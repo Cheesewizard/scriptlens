@@ -63,52 +63,23 @@ for 1 hour (a miss usually means a medication MedBud only just listed).
 - **Debug logging.** Logs matching decisions to the service worker console.
 - **Clear all cached data.**
 
-## Tests
+## Good to know
 
-```
-npm install
-```
-
-```
-npm test
-```
-
-The matcher is tested against the formulary the extension actually ships (1,162 medications) and a real
-browse page. Products that genuinely aren't in the formulary are asserted to produce no match, because a
-wrong medication is worse than none. Two wrong matches that an earlier, looser potency rule produced
-against real stock are kept as regression tests.
-
-The card scanner is tested against the real card grid, so a portal redesign fails the test suite instead
-of being found out on the live site. `linkedom` provides the DOM as a `devDependency`. The extension
-itself ships with no runtime dependencies.
-
-Regenerate the fixtures from a saved browse page:
-
-```
-node tools/make-card-fixture.mjs "path/to/Browse - CB1 Medical.html"
-```
-
-A saved browse page has your name and prescription balances on it. The tool copies only the card grid
-and refuses to write a fixture that still contains any of that. Don't commit the saved page itself.
-
-## Keeping it current
-
-The data is a frozen snapshot and nothing updates itself. When CB1 rotates stock or either site gets
-redesigned, [docs/MAINTENANCE.md](docs/MAINTENANCE.md) has a symptom-to-fix table and the refresh steps.
+- A major redesign of the CB1 portal could stop it working. If that happens the buttons simply stop
+  appearing — it won't quietly send you to the wrong page.
+- The medication list is built into the extension and doesn't update itself, so a brand-new product can
+  fall back to a search until the list is refreshed.
+- MedBud ratings are patient opinions from a community site, not medical advice. They help you narrow a
+  shortlist, not decide what to take — that's a conversation for your prescriber.
+- Not affiliated with, endorsed by, or connected to CB1 Medical, MedBud or Leafly.
 
 ## Support
 
-ScriptLens is free and maintained in spare time. If it saves you time you can
-[sponsor its upkeep](https://github.com/sponsors/Cheesewizard). It's optional and stays free either way.
-Changes are logged in [CHANGELOG.md](CHANGELOG.md).
+Free, and maintained in spare time. If it saves you time, you can
+[sponsor its upkeep](https://github.com/sponsors/Cheesewizard) — optional, and it stays free either way.
 
-## Caveats
+## Development
 
-- The portal is read from `aria-label`s, the most stable handle it offers, but a redesign can still
-  break things. When it breaks it breaks loudly rather than going silently wrong.
-- The formulary ships with the extension and doesn't update itself, so newly listed medications fall back
-  to a search until it's refreshed (see [docs/MAINTENANCE.md](docs/MAINTENANCE.md)).
-- Ratings on MedBud are patient opinions from a community site, not clinical guidance. They're useful for
-  narrowing a shortlist, not for deciding what to take. That's a conversation for your prescriber.
-- Not affiliated with, endorsed by, or connected to CB1 Medical, MedBud or Leafly. Built for personal
-  use.
+Contributions and fixes are welcome. Run the tests with `npm install`, then `npm test`. Keeping the
+built-in medication list current — and everything else a maintainer needs — is in
+[docs/MAINTENANCE.md](docs/MAINTENANCE.md). Changes are logged in [CHANGELOG.md](CHANGELOG.md).
