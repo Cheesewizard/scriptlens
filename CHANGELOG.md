@@ -2,7 +2,7 @@
 
 ## 1.0.0
 
-First public release, as **ScriptLens**.
+First public release, as **Strain Inspector**.
 
 - Adds a **View on MedBud** link to every medication on the CB1 Medical portal - patient reviews without
   a second tab or a copy-paste. Flower cards also get a **Leafly** link to the strain's terpene and
@@ -16,5 +16,5 @@ First public release, as **ScriptLens**.
   analytics, no account, no server, and no personal or medical data ever leaves your browser. Its only
   site permission is the CB1 Medical portal itself. See [PRIVACY.md](PRIVACY.md).
 
-ScriptLens links to the reviews rather than showing rating numbers on the card: reading MedBud's data
+Strain Inspector links to the reviews rather than showing rating numbers on the card: reading MedBud's data
 programmatically would need their permission, and their pages are behind bot protection that refuses it.

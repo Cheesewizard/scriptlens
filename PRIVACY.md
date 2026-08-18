@@ -1,26 +1,26 @@
 # Privacy policy
 
-**ScriptLens does not collect, store, or transmit any personal or medical data.** There is no analytics,
-no tracking, no account, and no server that belongs to ScriptLens.
+**Strain Inspector does not collect, store, or transmit any personal or medical data.** There is no analytics,
+no tracking, no account, and no server that belongs to Strain Inspector.
 
 This is a short, plain-English policy for a tool that runs entirely in your browser.
 
 ## What it reads
 
-On the CB1 Medical portal (`patient.cb1medical.com`), ScriptLens reads the **product name** shown on each
+On the CB1 Medical portal (`patient.cb1medical.com`), Strain Inspector reads the **product name** shown on each
 medication card - the text CB1 already puts in the page's accessibility labels. That is all it takes
 from the page. It does **not** read, store, or transmit your name, your prescription, your allowances,
 your order history, or anything else about you or your account.
 
 ## What leaves your browser, and where it goes
 
-- **Nothing goes to a ScriptLens server, because there isn't one.**
-- **ScriptLens never fetches anything** - it only ever builds links for you to click. When a product is
+- **Nothing goes to a Strain Inspector server, because there isn't one.**
+- **Strain Inspector never fetches anything** - it only ever builds links for you to click. When a product is
   not in the bundled data, the link is a web search built from the product name (a Google search scoped
   to MedBud, or to Leafly). Navigating there happens only when **you click** the link, exactly as if you
   had typed the name into a search box yourself.
 
-No link ScriptLens builds carries any information about you - only the public name of a medication.
+No link Strain Inspector builds carries any information about you - only the public name of a medication.
 
 ## What it stores
 
@@ -37,4 +37,4 @@ that enabled for extensions. You can clear all cached data from the settings pag
 ## Contact
 
 Questions or concerns: open an issue at
-<https://github.com/Cheesewizard/scriptlens>.
+<https://github.com/Cheesewizard/strain-inspector>.
