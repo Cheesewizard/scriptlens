@@ -44,9 +44,9 @@ offers you a link.
 
 PRIVATE BY DESIGN
 ScriptLens runs entirely in your browser. There is no account, no analytics, no tracking, and no server.
-It never reads, stores or transmits your name, your prescription, your allowances or your order history —
-only the public name of the medication shown on a card, and only to build a link. Full privacy policy:
-https://github.com/Cheesewizard/scriptlens/blob/main/PRIVACY.md
+It never reads, stores or transmits your name, your prescription, your allowances or your order history.
+It only reads the public name of the medication shown on a card, and only to build a link. Full privacy
+policy: https://github.com/Cheesewizard/scriptlens/blob/main/PRIVACY.md
 
 NOT MEDICAL ADVICE
 ScriptLens surfaces publicly available patient opinions and strain information. It is not medical advice,
@@ -54,6 +54,13 @@ and it is not affiliated with or endorsed by CB1 Medical, MedBud or Leafly. Deci
 medication belong with your prescriber.
 
 Free and open source: https://github.com/Cheesewizard/scriptlens
+Support development: https://github.com/sponsors/Cheesewizard
+```
+
+## Support URL (listing field)
+
+```
+https://github.com/sponsors/Cheesewizard
 ```
 
 ## Privacy practices tab
