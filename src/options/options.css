@@ -57,6 +57,53 @@ h2 {
 	color: #8fa39c;
 }
 
+.support-card {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 16px 18px;
+	border: 1px solid #2f6b4d;
+	border-radius: 10px;
+	background: #13241b;
+	text-decoration: none;
+	color: inherit;
+}
+
+.support-card:hover {
+	background: #162c20;
+	border-color: #3c8560;
+}
+
+.support-copy {
+	font-size: 13px;
+	line-height: 1.5;
+	color: #b9cabf;
+}
+
+.support-copy strong {
+	display: block;
+	margin-bottom: 3px;
+	font-size: 15px;
+	color: #dff5e9;
+}
+
+.donate {
+	flex-shrink: 0;
+	padding: 10px 18px;
+	border-radius: 8px;
+	background: #22c55e;
+	color: #06170d;
+	font-weight: 700;
+	font-size: 14px;
+	white-space: nowrap;
+}
+
+.support-card:hover .donate {
+	background: #34d174;
+}
+
 section {
 	display: flex;
 	flex-direction: column;
