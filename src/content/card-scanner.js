@@ -2,9 +2,14 @@
 // useless as selectors. Every card does carry accessibility labels, which are
 // stable and give the exact product name without any text scraping:
 //   <div aria-label="LIT WF Smalls T30 White Fire Flower 10g image">
-//   <button aria-label="Add LIT WF Smalls T30 White Fire Flower 10g to request">
-const ADD_BUTTON_SELECTOR = "button[aria-label^='Add '][aria-label$=' to request']";
-const ADD_LABEL_PATTERN = /^Add (.+) to request$/;
+//   <div dir="auto">LIT WF Smalls T30 White Fire Flower 10g</div>
+//
+// Cards are keyed off the product image, not the "Add to request" button: a
+// product that is out of stock or over the patient's THC limit has no add
+// button but still shows an image, and its reviews are worth just as much. Keying
+// off the button silently hid every such product — the majority of some tabs.
+const IMAGE_LABEL_SUFFIX = " image";
+const IMAGE_SELECTOR = "[aria-label$=' image']";
 const MAX_ANCESTOR_WALK = 6;
 
 export const PRODUCT_ATTRIBUTE = "data-medbud-product";
@@ -14,13 +19,17 @@ export function findProductCards(root)
 	if (!root) throw new Error("root is required");
 
 	const cards = [];
+	const seen = new Set();
 
-	for (const button of root.querySelectorAll(ADD_BUTTON_SELECTOR))
+	for (const image of root.querySelectorAll(IMAGE_SELECTOR))
 	{
-		const productName = ADD_LABEL_PATTERN.exec(button.getAttribute("aria-label"))?.[1];
-		if (!productName) continue;
+		const label = image.getAttribute("aria-label");
+		if (!label?.endsWith(IMAGE_LABEL_SUFFIX)) continue;
 
-		const card = findCardAncestor(button, productName);
+		const productName = label.slice(0, -IMAGE_LABEL_SUFFIX.length);
+		if (!productName || seen.has(productName)) continue;
+
+		const card = findCardAncestor(image, productName);
 		if (!card) continue;
 
 		// The grid recycles DOM nodes when filters or tabs change, so a card that
@@ -28,22 +37,23 @@ export function findProductCards(root)
 		// recorded name is what tells the two cases apart.
 		if (card.getAttribute(PRODUCT_ATTRIBUTE) === productName) continue;
 
+		seen.add(productName);
 		cards.push({ card, productName });
 	}
 
 	return cards;
 }
 
-// The card root is the nearest ancestor of the button that also holds the
-// product image, which self-validates the match via the same product name.
-function findCardAncestor(button, productName)
+// The card root is the nearest ancestor of the image that also holds the
+// product's title, which self-validates the pairing via the same product name
+// and filters out any stray image whose label happens to end in "image".
+function findCardAncestor(image, productName)
 {
-	const imageSelector = `[aria-label="${CSS.escape(productName)} image"]`;
-	let element = button.parentElement;
+	let element = image.parentElement;
 
 	for (let depth = 0; element && depth < MAX_ANCESTOR_WALK; depth += 1)
 	{
-		if (element.querySelector(imageSelector)) return element;
+		if (findTitleElement(element, productName)) return element;
 
 		element = element.parentElement;
 	}

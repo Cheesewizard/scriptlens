@@ -4,72 +4,27 @@ import assert from "node:assert/strict";
 import { findProductCards, findTitleElement, PRODUCT_ATTRIBUTE } from "../src/content/card-scanner.js";
 import { loadFixture, parseFragment } from "./helpers/dom.mjs";
 
-// The real card grid, lifted out of a saved browse page by
-// tools/make-card-fixture.mjs. Class names in it are hashed atomic utilities,
-// which is exactly why the scanner keys off accessibility labels instead.
 const GRID = "cb1-browse-grid.html";
 
-// Document order, which is the order the badges get applied in.
-const EXPECTED_NAMES = [
-	"Hilltop Leaf XSM T30 XS Mintz Flower 10g",
-	"Aurora Pedanios SRD T29 Sourdough Flower 10g",
-	"Dalgety MOG T24 Marshmallow OG Flower 10g",
-	"Tastee Bitz PS T18 Banjo Medical Cannabis Flower 10g",
-	"All Nations MDO-M T23 MAC Doughnut Smalls Flower 10g",
-	"All Nations TT-M T25 Tropic Thunder Smalls Flower 10g",
-	"All Nations MD T22 MAC Daddy Flower 10g",
-	"Papers RS-ELV T24 RS-11 Flower 10g",
-	"Common Roots WZ T25 Watermelon Zkittlez Flower 10g",
-	"4C Labs Value XK-S Smalls T24 Oaxacan Kush Flower 10g",
-	"Green Gold SP T23 Starburst Pebbles Flower 10g",
-	"Plantations Cérès RP T28 Rainbow Pavé Flower 10g",
-	"Plantations Cérès SB T19 Superboof Flower 10g",
-	"CannFX PM T25 Permanent Marker Flower 10g",
-	"4C Labs Core SCS T25 Scoops Flower 10g",
-	"4C Labs Core PGD T27 Pineapple God Flower 10g",
-	"Greyscales JFRO T23 Jack Frosted Flower 10g",
-	"4C Labs Value KCO T28 Kush Cookies Flower 10g",
-	"4C Labs Core PKS T29 Pink Kush Flower 10g",
-	"4C Labs Core PGL T22 Platinum Garlic Flower 10g",
-	"Seed Junky PM T25 Permanent Marker Flower 10g",
-	"Hilltop Leaf HTL BT T30 Banoffee Tart Flower 10g",
-	"Greyscales PLG T22 Platinum Gushers Flower 10g",
-	"HighGreens AA T27 Atomic Apple Flower 10g",
-	"Sitka WHG T20 White Hot Guava Flower 10g",
-	"4C Labs Core DGZ T28 Dawgzilla Flower 10g",
-	"Hilltop Leaf HTL GM T27 Grape Muffin Flower 10g",
-	"Phant GTH T22 Ghost Train Haze Flower 10g",
-	"4C Labs Core SCO T26 Sun County Kush Flower 10g",
-	"Common Roots MW T25 Maui Wowie Flower 10g",
-	"4C Labs Craft CTR T25 Citroli Flower 10g",
-	"FTP FP T21 Frosted Pave Flower 10g",
-	"HighGreens LDS T27 Lemon Diesel Fritter Flower 10g",
-	"Cérès CJ T27 Cap Junky Flower 10g",
-	"4C Labs Core CCK T26 Cold Creek Kush Flower 10g",
-	"Roxton Air FP T26 Flurry Pancakes Flower 10g",
-	"Green Karat SL T28 Super Lemon Skunk Flower 10g",
-	"Superseed GRP CKS T27 Grape Cookies Flower 10g",
-	"Therismos Access BLD T10:C10 Blue Dream Balanced Flower 10g",
-	"4C Labs GGU T25 Grandi Guava Flower 10g"
-];
-
-// The portal sells four kinds of medication on four tabs, and the scanner has to
-// read all of them: carts and oils are named quite differently to flower
-// ("T800", "25:25") and their cards are not guaranteed to share markup.
+// The four portal tabs, with the full product count on each — every card, not
+// only the orderable ones. A product that is out of stock or over the patient's
+// THC limit has no "Add to request" button but still shows an image and a title,
+// and the scanner reads it from the image so its reviews are not lost. Keying off
+// the add button once hid the majority of these: flower showed 40 of 128.
 const EVERY_TAB = [
-	["flower", GRID, 40],
-	["vapes", "cb1-vape-grid.html", 22],
-	["oils", "cb1-oil-grid.html", 20],
-	["pastilles", "cb1-pastille-grid.html", 2]
+	{ tab: "flower", fixture: GRID, count: 128, overLimit: "Cookies MD T25 Medellin Flower 10g" },
+	{ tab: "vapes", fixture: "cb1-vape-grid.html", count: 56, overLimit: null },
+	{ tab: "oils", fixture: "cb1-oil-grid.html", count: 54, overLimit: "Curaleaf T100 Oil 30ml" },
+	{ tab: "pastilles", fixture: "cb1-pastille-grid.html", count: 2, overLimit: null }
 ];
 
-test("reads every card on every tab, not just flower", () =>
+test("reads every product card on every tab", () =>
 {
-	for (const [tab, fixture, expected] of EVERY_TAB)
+	for (const { tab, fixture, count } of EVERY_TAB)
 	{
 		const cards = findProductCards(loadFixture(fixture));
 
-		assert.equal(cards.length, expected, `wrong card count on the ${tab} tab`);
+		assert.equal(cards.length, count, `wrong card count on the ${tab} tab`);
 
 		for (const { card, productName } of cards)
 		{
@@ -78,21 +33,46 @@ test("reads every card on every tab, not just flower", () =>
 	}
 });
 
-test("finds every product card in a real browse grid", () =>
+// The regression guard for the bug this scanner was rewritten to fix: a product
+// with no "Add to request" button (over the THC limit, or out of stock) must
+// still be found, because it still shows an image and its reviews still matter.
+test("finds cards that have no add button", () =>
 {
-	const cards = findProductCards(loadFixture(GRID));
+	for (const { tab, fixture, overLimit } of EVERY_TAB)
+	{
+		if (!overLimit) continue;
 
-	assert.equal(cards.length, EXPECTED_NAMES.length);
-	assert.deepEqual(cards.map((entry) => entry.productName), EXPECTED_NAMES);
+		const document = loadFixture(fixture);
+
+		assert.equal(
+			document.querySelector(`button[aria-label="Add ${overLimit} to request"]`),
+			null,
+			`${overLimit} was expected to have no add button`);
+
+		const found = findProductCards(document).some((entry) => entry.productName === overLimit);
+		assert.ok(found, `the scanner missed ${overLimit} on the ${tab} tab`);
+	}
 });
 
-// A leading digit becomes a hex escape, a colon becomes a backslash escape, and
-// accented characters must be left alone — all three are in the real grid, and
-// all three break a selector built by plain interpolation.
-test("finds cards whose names need escaping in a selector", () =>
+// The card is accepted only when it also holds the title bearing the same product
+// name, so every result is self-validating on the image, whether or not it can be
+// ordered.
+test("every card holds the image it was found by", () =>
 {
-	const cards = findProductCards(loadFixture(GRID));
-	const byName = new Map(cards.map((entry) => [entry.productName, entry.card]));
+	for (const { card, productName } of findProductCards(loadFixture(GRID)))
+	{
+		assert.ok(
+			[...card.querySelectorAll("[aria-label]")].some((element) =>
+				element.getAttribute("aria-label") === `${productName} image`),
+			`card for ${productName} lost its image`);
+	}
+});
+
+// A leading digit, a colon in a ratio, and accented characters are all in the
+// real grid; none may trip up the scan.
+test("finds cards whose names carry awkward characters", () =>
+{
+	const byName = new Map(findProductCards(loadFixture(GRID)).map((entry) => [entry.productName, entry.card]));
 
 	for (const name of [
 		"4C Labs Core SCS T25 Scoops Flower 10g",
@@ -101,23 +81,6 @@ test("finds cards whose names need escaping in a selector", () =>
 	])
 	{
 		assert.ok(byName.get(name), `no card resolved for ${name}`);
-	}
-});
-
-// The card is only accepted when it also holds the image bearing the same
-// product name, so every result is self-validating.
-test("returns a card that contains both the button and the matching image", () =>
-{
-	for (const { card, productName } of findProductCards(loadFixture(GRID)))
-	{
-		assert.ok(
-			card.querySelector(`button[aria-label="Add ${productName} to request"]`),
-			`card for ${productName} lost its add button`);
-
-		assert.ok(
-			[...card.querySelectorAll("[aria-label]")].some((element) =>
-				element.getAttribute("aria-label") === `${productName} image`),
-			`card for ${productName} lost its image`);
 	}
 });
 
@@ -137,36 +100,39 @@ test("finds the title element for every card", () =>
 test("skips a card already decorated with the same product", () =>
 {
 	const document = loadFixture(GRID);
-	const [first] = findProductCards(document);
+	const before = findProductCards(document);
+	const [first] = before;
 
 	first.card.setAttribute(PRODUCT_ATTRIBUTE, first.productName);
 
 	const names = findProductCards(document).map((entry) => entry.productName);
 
-	assert.equal(names.length, EXPECTED_NAMES.length - 1);
+	assert.equal(names.length, before.length - 1);
 	assert.ok(!names.includes(first.productName));
 });
 
-// The grid recycles DOM nodes across filter and tab changes, so a decorated
-// card can come back holding a different product and must be picked up again.
+// The grid recycles DOM nodes across filter and tab changes, so a decorated card
+// can come back holding a different product and must be picked up again.
 test("re-reports a recycled card now holding a different product", () =>
 {
 	const document = loadFixture(GRID);
-	const [first] = findProductCards(document);
+	const before = findProductCards(document);
+	const [first] = before;
 
 	first.card.setAttribute(PRODUCT_ATTRIBUTE, "Some Other Product T20 Flower 10g");
 
 	const names = findProductCards(document).map((entry) => entry.productName);
 
-	assert.equal(names.length, EXPECTED_NAMES.length);
+	assert.equal(names.length, before.length);
 	assert.ok(names.includes(first.productName));
 });
 
-test("ignores an add button with no matching product image", () =>
+test("ignores an image whose label has no matching title", () =>
 {
 	const document = parseFragment(`
 		<div>
-			<div><button aria-label="Add Ghost GH T20 Ghost Flower 10g to request">Add to Cart</button></div>
+			<img aria-label="Some Decorative Banner image">
+			<div dir="auto">An unrelated product</div>
 		</div>
 	`);
 

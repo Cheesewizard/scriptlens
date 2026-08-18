@@ -41,9 +41,15 @@ and worthless as selectors. Accessibility labels, however, are stable and carry 
 <button aria-label="Add LIT WF Smalls T30 White Fire Flower 10g to request">…</button>
 ```
 
-So cards are found by the add button's label, and the card root is the nearest ancestor that also holds
-the image labelled with the same product name — which validates the pairing rather than trusting a
-fixed depth. The badge goes before the title element, identified by exact text equality with the name.
+So cards are found by the **product image**, and the card root is the nearest ancestor of it that also
+holds the title bearing the same product name — which validates the pairing via that name rather than
+trusting a fixed depth, and filters out any stray image whose label happens to end in "image". The
+badge goes before that title element.
+
+The image is used rather than the "Add to request" button on purpose. A product that is out of stock or
+over the patient's THC limit has no add button — it shows a disabled "THC (%) limit" instead — but it
+still has an image and a title, and its reviews are worth just as much. Keying off the button silently
+hid every such product: on the flower tab that was 88 of 128. The image is present on every card.
 
 The grid recycles DOM nodes when filters or tabs change, so a decorated card can come back holding a
 different product. Cards record which product they were decorated for in `data-medbud-product`, and a
@@ -142,10 +148,15 @@ where a live index works not at all.
 
 ## The shared mapping
 
-Every patient sees the same catalogue — 84 products across the portal's four tabs at the time of
-writing — so resolving a medication is not per-user work. `product-mapping.js` holds a
-name-to-medication mapping that ships with the extension and optionally refreshes from a URL once a
-day. One resolution serves everybody.
+Every patient sees the same catalogue, so resolving a medication is not per-user work.
+`product-mapping.js` holds a name-to-medication mapping that ships with the extension and optionally
+refreshes from a URL once a day. One resolution serves everybody.
+
+The mapping and formulary target the *orderable* catalogue — around 84 products across the four tabs at
+the time of writing. The scanner surfaces more than that (out-of-stock and over-limit products get a
+badge too), and those extra, browse-only products are mostly not in the mapping, so they fall back to
+search. That is fine: they cannot be ordered, so a one-hop search on a card you are only looking at
+costs nothing worth spending an index entry on.
 
 This is the tier that scales. A per-user search key does not survive a public release: users will not
 obtain one, and a key embedded in the extension is extracted immediately and billed to whoever shipped
@@ -168,7 +179,7 @@ those under `/vape-cartridges/`, `/oils/` and `/edibles/`, and their ratio-named
 `T10:C10`) tokenise differently from the merged slugs MedBud uses (`t200c200`, `t10c10`). Rather than
 teach the matcher three more naming schemes and a ratio grammar — risky, on a medicine — those tabs are
 covered by mapping entries, each verified against MedBud's own section index page. Path validation
-accepts all four sections. Across the full 84-product catalogue this takes direct-link coverage from
+accepts all four sections. Across the orderable catalogue this takes direct-link coverage from
 42% to 90%; the remainder are renames, generic slugs and a few products MedBud has not listed, which
 fall back to search.
 
@@ -240,29 +251,18 @@ the real card grid rather than hand-written markup that would drift from the sit
 spec areas — layout, events, navigation — that never come up here. It is a `devDependency`; the
 extension itself still ships with no runtime dependencies.
 
-linkedom does not implement `CSS`, which `card-scanner` uses to build its attribute selector, so
-`tests/helpers/dom.mjs` installs the CSSOM-spec `CSS.escape` rather than an approximation — otherwise
-the tests would exercise different escaping to production.
-
-That escaping is load-bearing and worth not "simplifying" away. `CSS.escape` escapes for use as an
-*identifier*, and the selector interpolates it inside a quoted attribute value, which looks wrong:
-
-```
-"4C Labs Core ACB T21 …"  ->  [aria-label="\34 C\ Labs\ Core\ ACB\ T21\ … image"]
-"… Creamy Kees #5 …"      ->  [aria-label="…Creamy\ Kees\ \#5\ … image"]
-```
-
-CSS string escapes resolve those back to the original characters, so it matches — verified in Chrome
-against all 23 cards, not just in linkedom. It also correctly escapes a `"` or `\` in a product name,
-which is the case that would otherwise break the selector.
+The scanner matches the title by comparing element text, not by building a selector from the product
+name, so an awkward name — a leading digit, a colon, a `#`, an accent — needs no escaping and cannot
+break the scan. (An earlier version did build a `[aria-label="…"]` selector and needed `CSS.escape`;
+keying off the image and comparing title text removed that whole class of fragility.)
 
 ### Fixtures
 
 `tests/fixtures/cb1-*-grid.html` are the real card grids from all four portal tabs, extracted from
 saved pages by `tools/make-card-fixture.mjs`. Regenerate one by saving that tab and re-running the tool
 with a fixture name. All four are covered because carts and oils are named quite differently to flower
-(`T800`, `25:25`) and their cards are not guaranteed to share markup — the scanner reads all 84
-products across the four tabs.
+(`T800`, `25:25`) and their cards are not guaranteed to share markup — the scanner reads every card on
+each (128 / 56 / 54 / 2 at the time of writing), over-limit and out-of-stock included.
 
 A page saved from now on is saved with the extension running, so the tool also strips this extension's
 own badges and `data-medbud-product` attributes (and title-link wrappers, from pages saved in the
