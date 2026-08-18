@@ -9,6 +9,13 @@ No more opening a second tab and searching for each product by hand.
        alt="ScriptLens adds a green 'View on MedBud' button and a separate 'Leafly' button above every product on the CB1 Medical portal">
 </p>
 
+<p align="center">
+  <a href="https://github.com/sponsors/Cheesewizard">
+    <img src="https://img.shields.io/badge/Sponsor%20ScriptLens-ec6cb9?logo=githubsponsors&logoColor=white&style=for-the-badge"
+         alt="Sponsor ScriptLens on GitHub">
+  </a>
+</p>
+
 It's free, open source, and not affiliated with CB1 Medical, MedBud or Leafly. It runs entirely in your
 browser. There's no analytics, no account, and no personal or medical data ever leaves it (see the
 [privacy policy](PRIVACY.md)).
@@ -41,11 +48,11 @@ There's no build step. It loads as-is.
 
 ScriptLens carries a built-in copy of MedBud's product list. When a page loads, it reads each product's
 name from the card and looks it up. A confident match links straight to that medication's MedBud page;
-anything it can't place — a renamed product, or one added since the built-in list was captured — links to
+anything it can't place (a renamed product, or one added since the built-in list was captured) links to
 a MedBud search instead, which still lands you on it.
 
 The search fallback is normal, not a failure. Stock rotates and MedBud renames things, and some products
-can't be matched by name alone — either way you still get a working link. Resolved links are cached
+can't be matched by name alone, but either way you still get a working link. Resolved links are cached
 briefly so pages stay fast.
 
 ## Configuration
@@ -59,20 +66,20 @@ briefly so pages stay fast.
 ## Good to know
 
 - A major redesign of the CB1 portal could stop it working. If that happens the buttons simply stop
-  appearing — it won't quietly send you to the wrong page.
+  appearing, rather than quietly sending you to the wrong page.
 - The medication list is built into the extension and doesn't update itself, so a brand-new product can
   fall back to a search until the list is refreshed.
 - MedBud ratings are patient opinions from a community site, not medical advice. They help you narrow a
-  shortlist, not decide what to take — that's a conversation for your prescriber.
+  shortlist, not decide what to take. That's a conversation for your prescriber.
 - Not affiliated with, endorsed by, or connected to CB1 Medical, MedBud or Leafly.
 
 ## Support
 
 Free, and maintained in spare time. If it saves you time, you can
-[sponsor its upkeep](https://github.com/sponsors/Cheesewizard) — optional, and it stays free either way.
+[sponsor its upkeep](https://github.com/sponsors/Cheesewizard). It's optional, and stays free either way.
 
 ## Development
 
 Contributions and fixes are welcome. Run the tests with `npm install`, then `npm test`. Keeping the
-built-in medication list current — and everything else a maintainer needs — is in
+built-in medication list current, and everything else a maintainer needs, is in
 [docs/MAINTENANCE.md](docs/MAINTENANCE.md). Changes are logged in [CHANGELOG.md](CHANGELOG.md).
