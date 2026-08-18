@@ -11,7 +11,7 @@
   <rect width="760" height="470" fill="#F5F8F5"/>
 
   <!-- heading: shows WHERE it appears -->
-  <text x="32" y="40" fill="#16241C" font-size="20" font-weight="700">Two links Strain Inspector adds above every product's title</text>
+  <text x="32" y="40" fill="#16241C" font-size="20" font-weight="700">Two links StrainInspector adds above every product's title</text>
 
   <!-- illustration tag -->
   <rect x="470" y="58" width="258" height="28" rx="14" fill="#EAEFEA"/>

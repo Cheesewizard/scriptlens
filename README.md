@@ -1,4 +1,4 @@
-# Strain Inspector
+# StrainInspector
 
 A browser extension that links every medication in the CB1 Medical patient portal to its
 [MedBud](https://medbud.wiki) patient reviews and its [Leafly](https://www.leafly.com) strain profile.
@@ -6,13 +6,13 @@ No more opening a second tab and searching for each product by hand.
 
 <p align="center">
   <img src="docs/preview-1280x800.png" width="760"
-       alt="Strain Inspector adds a green 'View on MedBud' button and a separate 'Leafly' button above every product on the CB1 Medical portal">
+       alt="StrainInspector adds a green 'View on MedBud' button and a separate 'Leafly' button above every product on the CB1 Medical portal">
 </p>
 
 <p align="center">
   <a href="https://github.com/sponsors/Cheesewizard">
-    <img src="https://img.shields.io/badge/Sponsor%20Strain%20Inspector-ec6cb9?logo=githubsponsors&logoColor=white&style=for-the-badge"
-         alt="Sponsor Strain Inspector on GitHub">
+    <img src="https://img.shields.io/badge/Sponsor%20StrainInspector-ec6cb9?logo=githubsponsors&logoColor=white&style=for-the-badge"
+         alt="Sponsor StrainInspector on GitHub">
   </a>
 </p>
 
@@ -31,7 +31,7 @@ wrong.
 
 The extension only ever gives you a link. It doesn't fetch reviews or ratings to show on the card.
 Reading MedBud's ratings automatically would need their permission, and their pages block automated
-requests anyway, so Strain Inspector sends you to the reviews instead of scraping them.
+requests anyway, so StrainInspector sends you to the reviews instead of scraping them.
 
 ## Installing
 
@@ -46,7 +46,7 @@ There's no build step. It loads as-is.
 
 ## How it works
 
-Strain Inspector carries a built-in copy of MedBud's product list. When a page loads, it reads each product's
+StrainInspector carries a built-in copy of MedBud's product list. When a page loads, it reads each product's
 name from the card and looks it up. A confident match links straight to that medication's MedBud page;
 anything it can't place (a renamed product, or one added since the built-in list was captured) links to
 a MedBud search instead, which still lands you on it.
