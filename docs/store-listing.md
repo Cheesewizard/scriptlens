@@ -1,0 +1,101 @@
+# Chrome Web Store listing — ScriptLens
+
+Paste-ready copy for the Web Store submission. Update here, then re-paste, when the listing changes.
+
+## Name
+
+```
+ScriptLens
+```
+
+## Summary (max 132 characters)
+
+```
+Adds MedBud patient-review and Leafly strain-profile links to every medication on the CB1 Medical portal.
+```
+
+## Category
+
+Productivity
+
+## Language
+
+English (UK)
+
+## Detailed description
+
+```
+ScriptLens adds a link to patient reviews and strain information next to every medication on the
+CB1 Medical patient portal — so you can check what other patients think of a product without opening
+a second tab and searching for it by hand.
+
+WHAT IT DOES
+• On every product card, a "View on MedBud" link takes you straight to that medication's page on
+  MedBud.wiki, the UK patient-review community.
+• On flower, a second "Leafly" link opens the strain's terpene and effect profile.
+• Works on all four tabs — flower, oils, vapes and pastilles — and on every product, including ones
+  that are out of stock or over your prescription limit.
+
+HOW IT WORKS
+ScriptLens ships with a snapshot of MedBud's medication list and matches each product locally, so most
+cards link straight to the exact page. For anything it can't place directly — a renamed or newly listed
+product — the link runs a search that lands on the right page instead. Nothing is scraped: it only ever
+offers you a link.
+
+PRIVATE BY DESIGN
+ScriptLens runs entirely in your browser. There is no account, no analytics, no tracking, and no server.
+It never reads, stores or transmits your name, your prescription, your allowances or your order history —
+only the public name of the medication shown on a card, and only to build a link. Full privacy policy:
+https://github.com/Cheesewizard/cb1-medbud-ratings/blob/main/PRIVACY.md
+
+NOT MEDICAL ADVICE
+ScriptLens surfaces publicly available patient opinions and strain information. It is not medical advice,
+and it is not affiliated with or endorsed by CB1 Medical, MedBud or Leafly. Decisions about your
+medication belong with your prescriber.
+
+Free and open source: https://github.com/Cheesewizard/cb1-medbud-ratings
+```
+
+## Privacy practices tab
+
+**Single purpose**
+
+```
+ScriptLens adds links to patient reviews (MedBud) and strain profiles (Leafly) for the medications shown
+on the CB1 Medical patient portal, so the user can research a product without leaving the page.
+```
+
+**Permission justifications**
+
+- `storage`
+  ```
+  Stores the user's settings and a local cache of resolved links, so the extension does not recompute
+  them on every page load. This data stays in the browser and is never transmitted.
+  ```
+- Host permission `https://patient.cb1medical.com/*`
+  ```
+  The extension runs only on the CB1 Medical portal. It reads the product name each card already exposes
+  in its accessibility label and adds the review/profile links. This is the extension's entire function.
+  ```
+- Host permission `https://medbud.wiki/*`
+  ```
+  Used only if the user turns on the off-by-default "Fetch ratings from MedBud" option, to read a
+  medication's public schema.org rating data. Disabled by default; with it off, nothing is requested
+  from MedBud.
+  ```
+
+**Remote code:** No, it does not use remote code.
+
+**Data collection:** ScriptLens does not collect or use any user data.
+
+## Screenshots (need 1–5, 1280×800 or 640×400 PNG)
+
+The portal needs a login, so capture these yourself on a real browse page:
+
+1. A browse grid with several cards showing the "View on MedBud · Leafly" badge — the core value, one glance.
+2. A close-up of a single card with the badge.
+3. The settings page.
+
+Blur or crop out the header (your name) and the allowance bar (your prescription balances) before
+uploading — same reason the fixtures strip them.
+```
