@@ -39,21 +39,14 @@ There's no build step. It loads as-is.
 
 ## How it works
 
-1. A snapshot of MedBud's formulary (1,162 medications) ships in `src/data/medbud-index.json`.
-2. The content script reads each card's product name from its `aria-label`.
-3. Names are matched against the formulary. The potency (`T30`), the product code (`WF`, `TT-M`) and the
-   strain words all have to agree. That's what stops `LIT WF T30 White Fire` matching `LIT SL T30 Snow
-   Lotus`.
-4. A confident match links to that medication's page. Anything else links to a search restricted to
-   MedBud, which still finds products that were renamed or listed after the snapshot.
+ScriptLens carries a built-in copy of MedBud's product list. When a page loads, it reads each product's
+name from the card and looks it up. A confident match links straight to that medication's MedBud page;
+anything it can't place — a renamed product, or one added since the built-in list was captured — links to
+a MedBud search instead, which still lands you on it.
 
-The search fallback is normal, not a rare edge case. Stock rotates constantly and MedBud renames things.
-CB1's `Aurora Pedanios SRD T29 Sourdough` lives at MedBud's `/strains/aurora-pedanios/pedanios-t29/`, a
-slug with neither the product code nor the strain name in it. No token matcher can resolve that. A
-search can.
-
-Each resolved link is cached so it isn't recomputed on every page load: a match for 12 hours, a fallback
-for 1 hour (a miss usually means a medication MedBud only just listed).
+The search fallback is normal, not a failure. Stock rotates and MedBud renames things, and some products
+can't be matched by name alone — either way you still get a working link. Resolved links are cached
+briefly so pages stay fast.
 
 ## Configuration
 
