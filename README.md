@@ -1,4 +1,4 @@
-# GreenLens
+# ScriptLens
 
 A browser extension that links every medication in the CB1 Medical patient portal to its
 [MedBud](https://medbud.wiki) patient reviews and its [Leafly](https://www.leafly.com) strain profile —
@@ -132,7 +132,7 @@ The data is a frozen snapshot — nothing self-updates. When CB1 rotates stock o
 
 ## Support
 
-GreenLens is free and maintained in spare time. If it saves you time, you can
+ScriptLens is free and maintained in spare time. If it saves you time, you can
 [sponsor its upkeep](https://github.com/sponsors/Cheesewizard) — entirely optional, and it stays free
 either way. Changes are logged in [CHANGELOG.md](CHANGELOG.md).
 
