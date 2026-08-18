@@ -1,5 +1,6 @@
-// Generates the StrainInspector icons - a green rating star inside a lens ring on a dark
-// rounded square - as PNGs, with no image tooling. Run after changing the design:
+// Generates the StrainInspector icons - a white magnifying glass with a light-green
+// lens on a brand-green rounded square - as PNGs, with no image tooling. Run after
+// changing the design:
 //   node tools/make-icons.mjs
 import { deflateSync } from "node:zlib";
 import { writeFileSync, mkdirSync } from "node:fs";
@@ -7,9 +8,10 @@ import { writeFileSync, mkdirSync } from "node:fs";
 const SIZES = [16, 32, 48, 128];
 const SUPERSAMPLE = 4;
 
-// Matches the badge palette (badge.css): dark ground, high-tier green.
-const BG = [15, 31, 22];        // #0f1f16
-const GREEN = [74, 222, 128];   // #4ade80
+// Matches the preview/promo art: brand green tile, white glass, light-green lens.
+const TILE = [31, 122, 77];    // #1F7A4D
+const GLASS = [255, 255, 255]; // white ring + handle
+const LENS = [143, 227, 180];  // #8FE3B4 inner glass
 
 const OUT_DIR = new URL("../icons/", import.meta.url);
 
@@ -19,29 +21,35 @@ function render(size)
 	const n = size * SUPERSAMPLE;
 	const hi = new Uint8ClampedArray(n * n * 4);
 
-	const radius = n * 0.22;
-	const centre = n / 2;
-	const ringOuter = n * 0.40;
-	const ringInner = n * 0.32;
-	const star = starPolygon(centre, centre, n * 0.24, n * 0.10, 5, -Math.PI / 2);
+	const radius = n * 0.22;             // rounded-square corner radius
+	const cx = n * 0.43, cy = n * 0.43;  // lens centre, set high-left to leave room for the handle
+	const ringOuter = n * 0.27;
+	const ringInner = n * 0.16;          // ring thickness ~0.11n
+	const lensDot = n * 0.11;            // inner glass
+	const handleHalf = n * 0.06;         // handle half-width
+	// Handle runs from the ring's lower-right edge out towards the corner.
+	const hx0 = cx + ringOuter * Math.SQRT1_2;
+	const hy0 = cy + ringOuter * Math.SQRT1_2;
+	const hx1 = n * 0.76, hy1 = n * 0.76;
 
 	for (let y = 0; y < n; y += 1)
 	{
 		for (let x = 0; x < n; x += 1)
 		{
 			const i = (y * n + x) * 4;
+			const px = x + 0.5, py = y + 0.5;
 
-			if (!roundedRectContains(x + 0.5, y + 0.5, n, radius))
+			if (!roundedRectContains(px, py, n, radius))
 			{
 				hi[i + 3] = 0;
 				continue;
 			}
 
-			const dist = Math.hypot(x + 0.5 - centre, y + 0.5 - centre);
+			const dist = Math.hypot(px - cx, py - cy);
 			const onRing = dist <= ringOuter && dist >= ringInner;
-			const inStar = pointInPolygon(x + 0.5, y + 0.5, star);
+			const onHandle = distanceToSegment(px, py, hx0, hy0, hx1, hy1) <= handleHalf;
 
-			const colour = onRing || inStar ? GREEN : BG;
+			const colour = onRing || onHandle ? GLASS : (dist <= lensDot ? LENS : TILE);
 
 			hi[i] = colour[0];
 			hi[i + 1] = colour[1];
@@ -91,33 +99,13 @@ function roundedRectContains(x, y, size, radius)
 	return Math.hypot(radius - nx, radius - ny) <= radius;
 }
 
-function starPolygon(cx, cy, outer, inner, points, rotation)
+// Shortest distance from point (px,py) to the segment (ax,ay)-(bx,by).
+function distanceToSegment(px, py, ax, ay, bx, by)
 {
-	const vertices = [];
-
-	for (let i = 0; i < points * 2; i += 1)
-	{
-		const radius = i % 2 === 0 ? outer : inner;
-		const angle = rotation + (i * Math.PI) / points;
-		vertices.push([cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius]);
-	}
-
-	return vertices;
-}
-
-function pointInPolygon(x, y, polygon)
-{
-	let inside = false;
-
-	for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1)
-	{
-		const [xi, yi] = polygon[i];
-		const [xj, yj] = polygon[j];
-
-		if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
-	}
-
-	return inside;
+	const dx = bx - ax, dy = by - ay;
+	const len2 = dx * dx + dy * dy;
+	const t = len2 === 0 ? 0 : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2));
+	return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
 }
 
 // Minimal PNG encoder: 8-bit RGBA, one zlib IDAT.
