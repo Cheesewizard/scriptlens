@@ -1,8 +1,11 @@
-# CB1 x MedBud Ratings
+# BudLens
 
-A Chrome extension that pulls patient ratings from [MedBud.wiki](https://medbud.wiki) and shows them
-directly on the medication cards in the CB1 Medical patient portal, so browsing doesn't need a second
-tab and a manual search for every product.
+A browser extension that links every medication in the CB1 Medical patient portal to its
+[MedBud](https://medbud.wiki) patient reviews and its [Leafly](https://www.leafly.com) strain profile —
+so browsing doesn't need a second tab and a manual search for every product.
+
+Free, open source, and unaffiliated with CB1 Medical, MedBud or Leafly. Runs entirely in your browser;
+no analytics, no account, and no personal or medical data ever leaves it ([privacy policy](PRIVACY.md)).
 
 Each card gains a small badge above its title:
 
@@ -28,9 +31,12 @@ page for the written reviews.
 
 ## Installing
 
-1. Clone this repository.
+Until it is on the Chrome Web Store, load it unpacked (works in Chrome, Brave, Edge and other
+Chromium browsers):
+
+1. Download this repository (**Code → Download ZIP**, or clone it) and unzip it.
 2. Open `chrome://extensions` and enable **Developer mode**.
-3. Choose **Load unpacked** and select the repository root.
+3. Choose **Load unpacked** and select the folder.
 
 No build step — the extension loads as-is.
 
@@ -123,6 +129,12 @@ itself.
 
 The data is a frozen snapshot — nothing self-updates. When CB1 rotates stock or either site reskins,
 [docs/MAINTENANCE.md](docs/MAINTENANCE.md) has the symptom-to-fix table and the exact refresh recipes.
+
+## Support
+
+BudLens is free and maintained in spare time. If it saves you time, you can
+[sponsor its upkeep](https://github.com/sponsors/Cheesewizard) — entirely optional, and it stays free
+either way. Changes are logged in [CHANGELOG.md](CHANGELOG.md).
 
 ## Caveats
 

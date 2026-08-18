@@ -1,11 +1,13 @@
 {
-	"name": "cb1-medbud-ratings",
-	"version": "0.1.0",
+	"name": "budlens",
+	"version": "1.0.0",
 	"private": true,
 	"type": "module",
-	"description": "Chrome extension that shows MedBud.wiki patient ratings on CB1 Medical portal medication cards.",
+	"description": "Browser extension that links every medication in the CB1 Medical portal to its MedBud reviews and Leafly strain profile.",
 	"scripts": {
-		"test": "node --test tests/*.test.mjs"
+		"test": "node --test tests/*.test.mjs",
+		"icons": "node tools/make-icons.mjs",
+		"package": "node tools/package.mjs"
 	},
 	"devDependencies": {
 		"linkedom": "^0.18.13"

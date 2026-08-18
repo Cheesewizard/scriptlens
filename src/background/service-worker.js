@@ -7,6 +7,9 @@ import { MESSAGE_TYPES } from "../shared/messages.js";
 import { loadSettings } from "../shared/settings.js";
 import { setDebugLogging, error } from "../shared/logging.js";
 
+// The toolbar icon has no popup; clicking it opens the settings page.
+chrome.action?.onClicked.addListener(() => chrome.runtime.openOptionsPage());
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
 {
 	handleMessage(message)

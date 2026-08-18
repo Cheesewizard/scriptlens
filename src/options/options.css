@@ -23,6 +23,32 @@ h1 {
 	font-size: 20px;
 }
 
+.tagline {
+	margin: -20px 0 0;
+	color: #8b968f;
+	font-size: 13px;
+}
+
+footer {
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+	padding-top: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.disclaimer,
+.support {
+	margin: 0;
+	color: #8b968f;
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+footer a {
+	color: #4ade80;
+}
+
 h2 {
 	margin: 0 0 12px;
 	font-size: 14px;
