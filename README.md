@@ -7,27 +7,20 @@ so browsing doesn't need a second tab and a manual search for every product.
 Free, open source, and unaffiliated with CB1 Medical, MedBud or Leafly. Runs entirely in your browser;
 no analytics, no account, and no personal or medical data ever leaves it ([privacy policy](PRIVACY.md)).
 
-Each card gains a small badge above its title:
-
-| State | Meaning |
-| --- | --- |
-| View on MedBud | Links to the medication's MedBud page. The normal state of every card. |
-| ★★★☆☆ 3.00 · 1 rating | MedBud's community average, when live ratings are enabled and reachable. |
-| Not yet rated | Nobody has rated the medication yet. |
-| MedBud check needed | Live ratings are on and Cloudflare is refusing the request. |
-
-The **View on MedBud** button is one behaviour, one label. Almost always it opens the medication's exact
-page; for the occasional product MedBud has renamed or not yet listed, the same button runs a search
-that lands on it, with nothing on the card to distinguish the two.
+Each card gains a small **View on MedBud** button above its title — one behaviour, one label. Almost
+always it opens the medication's exact MedBud page; for the occasional product MedBud has renamed or not
+yet listed, the same button runs a search that lands on it, with nothing on the card to distinguish the
+two.
 
 Flower cards carry a second button, **Leafly**, to the strain's terpene and effect profile. MedBud is
 the patient reviews; Leafly is the strain data. Leafly is organised by strain rather than by product and
 its naming does not follow from a CB1 name, so this link runs a search scoped to Leafly's strain pages
 rather than guessing a URL that would usually be wrong.
 
-Hovering shows MedBud's per-category breakdown — Medicinal Effect, Tastes & Terpenes, Trim &
-Uniformity, Freshness — which is usually what decides an order. The average links through to the full
-page for the written reviews.
+The extension only ever offers a **link** — it does not fetch reviews or ratings and show them on the
+card. Reading MedBud's rating data programmatically would need MedBud's permission, and their pages are
+behind bot protection that refuses it anyway. So ScriptLens takes you to the reviews rather than
+scraping them.
 
 ## Installing
 
@@ -39,18 +32,6 @@ Chromium browsers):
 3. Choose **Load unpacked** and select the folder.
 
 No build step — the extension loads as-is.
-
-## Why no ratings inline
-
-MedBud is behind Cloudflare bot mitigation that refuses the extension's background requests outright —
-`403`, `cf-mitigated: challenge` — while the same URL loads fine in a tab. There is no way for an MV3
-background fetch to present as a page navigation, and the workaround that would "fix" it is automating
-what that protection exists to stop. So the extension does not fetch from MedBud at all.
-
-Instead it ships MedBud's formulary and does the matching locally, then links you to the page. You lose
-the number on the card; you keep never having to search for the medication by hand.
-
-Live fetching is still in the code behind an off-by-default option, for if MedBud's protection relaxes.
 
 ## How it works
 
@@ -67,29 +48,14 @@ medications: CB1's `Aurora Pedanios SRD T29 Sourdough` is MedBud's `Aurora SRD-C
 `/strains/aurora-pedanios/pedanios-t29/` — a slug with neither the product code nor the strain name in
 it. No token matcher resolves that; a search does.
 
-### Cache lifetimes
-
-New medications are listed constantly, so nothing is cached for long, and a miss actively chases a
-refresh rather than waiting one out:
-
-| Data | Lifetime |
-| --- | --- |
-| Medication index | 6 hours |
-| Product rating | 6 hours |
-| Successful match | 12 hours |
-| Failed match | 1 hour |
-
-If a product doesn't match and the index is more than 30 minutes old, the index is refetched
-immediately and the match retried once. A strain that appeared on MedBud this morning therefore shows
-up on the next page load rather than after the cache happens to expire. The options page shows the
-index age and offers a manual refresh.
+Each resolved link is cached so it is not recomputed on every page load: a match for 12 hours, a
+fallback for 1 hour (the likeliest reason for a miss is a medication MedBud has only just listed).
 
 ## Configuration
 
 - **Minimum match confidence** — raise it if a card shows the wrong medication, lower it if a familiar
   product falls back to a search.
 - **Show a search link on products the bundled formulary does not list** — on by default.
-- **Fetch ratings from MedBud** — off by default; currently refused by Cloudflare.
 - **Debug logging** — logs matching decisions to the service worker console.
 - **Clear all cached data**.
 
@@ -137,13 +103,10 @@ either way. Changes are logged in [CHANGELOG.md](CHANGELOG.md).
 
 - The portal is read from `aria-label`s, the most stable handle it offers, but a reskin will still
   break things. Failures are loud rather than silently wrong.
-- MedBud has announced that some data is moving behind a login for MHRA reasons. If that covers
-  ratings, sign in to MedBud in the same browser.
-- MedBud is behind Cloudflare bot mitigation that refuses the extension's requests — its sitemap
-  included — which is why ratings are not fetched and the formulary ships with the extension rather
-  than updating itself. MedBud's `robots.txt` permits the pages this reads, but the protection is
-  blunt, so the extension does not argue with it.
-- Ratings are patient opinions collected by a community site, not clinical guidance. Useful for
-  narrowing a shortlist, not for deciding what to take — that conversation belongs with your prescriber.
-  MedBud says the same thing on every page it publishes.
-- Not affiliated with, endorsed by, or connected to CB1 Medical or MedBud. Built for personal use.
+- The formulary ships with the extension and does not update itself, so newly listed medications fall
+  back to a search until it is refreshed (see [docs/MAINTENANCE.md](docs/MAINTENANCE.md)).
+- Ratings on MedBud are patient opinions collected by a community site, not clinical guidance. Useful
+  for narrowing a shortlist, not for deciding what to take — that conversation belongs with your
+  prescriber.
+- Not affiliated with, endorsed by, or connected to CB1 Medical, MedBud or Leafly. Built for personal
+  use.

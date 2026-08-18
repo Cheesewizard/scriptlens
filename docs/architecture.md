@@ -16,11 +16,10 @@ content-side code use normal imports. That is why `src/content/*.js` and `src/sh
 | Module | Responsibility |
 | --- | --- |
 | `background/service-worker.js` | Message routing only. |
-| `background/rating-service.js` | Match then rating lookup, de-duplication, stale-index recovery. |
-| `background/medbud-index.js` | Fetches, caches and pre-tokenises the medication index. |
-| `background/medbud-product.js` | Reads one medication page's rating microdata. |
+| `background/rating-service.js` | Resolves a product to its MedBud link (mapping, matcher, or search); de-duplicates in-flight lookups. |
+| `background/medbud-index.js` | Loads and pre-tokenises the bundled medication formulary. |
 | `background/product-matcher.js` | Pure functions: tokenising and scoring. No I/O, so directly testable. |
-| `background/medbud-request.js` | MedBud fetching, Cloudflare challenge detection and backoff. Only used when live ratings are enabled. |
+| `background/product-mapping.js` | The shared name-to-medication mapping and its validation. |
 | `shared/medbud-link.js` | Builds the medication URL, or the search that replaces it. |
 | `background/request-queue.js` | Caps concurrent outbound requests. |
 | `background/http-cache.js` | TTL cache over `chrome.storage.local`. |
@@ -75,25 +74,14 @@ verify a slug against, so a guessed URL would 404 more often than not. A search 
 offered, so its bot protection and terms are never engaged. This is the same shape as the whole
 extension: join two sites through their most stable handle, link out, never scrape what is gated.
 
-## Reading MedBud
+## Never fetching MedBud
 
-MedBud emits schema.org microdata, which is more stable than either its visible wording or its CSS:
-
-```html
-<div id="review-aggregate-rating" itemprop="aggregateRating" itemscope
-     itemtype="https://schema.org/AggregateRating">
-  <meta itemprop="ratingValue" content="3.00">
-  <meta itemprop="ratingCount" content="1">
-  <meta itemprop="reviewCount" content="1">
-</div>
-```
-
-Pages are parsed as text rather than as a DOM. Service workers have no `DOMParser`, and the
-alternatives — an offscreen document, or shipping multi-megabyte HTML to the content script — cost more
-than they are worth for reading a handful of `meta` attributes and one table.
-
-The index is scraped from `/strains/` by matching anchors of the form `/strains/<brand>/<product>/`.
-Single-segment paths are brand landing pages and are excluded.
+The extension only ever offers a **link** to MedBud; it never requests a page from it. Showing a
+rating on the card would mean reading MedBud's data programmatically, which needs their permission —
+and their pages are behind Cloudflare bot protection that refuses automated requests anyway. So there
+is no fetching, no `medbud.wiki` host permission, and nothing to be blocked. The formulary used for
+matching ships with the extension (see below); the medication URL is built from a path, the search
+fallback is a plain search link, and both open only when the user clicks.
 
 ## Matching
 
@@ -196,42 +184,9 @@ identical to a directly-resolved one; only the href differs.
 user-supplied key. It was removed for release: almost no user obtains a key, the extra host permission
 invited scrutiny, and the plain search fallback covers the case perfectly well.)
 
-## Cloudflare
-
-MedBud sits behind Cloudflare bot mitigation. A request from the service worker with no clearance gets
-`403` with `cf-mitigated: challenge` and the "Security Check" interstitial, which asks for a click and
-says in as many words that it is there to stop automated scraping and AI crawlers.
-
-A background `fetch` cannot answer an interactive challenge. What makes the extension work at all is
-that `credentials: "include"` carries the `cf_clearance` cookie the user's *ordinary browsing* of
-MedBud already earned, so the extension rides on a human session rather than presenting as a bot. When
-that cookie is absent or expired — a fresh profile, or a while since MedBud was last visited — every
-lookup fails until the user opens MedBud in a tab.
-
-That is a user-clearable state, not a bug, so it is reported as one. `medbud-request.js` detects the
-challenge, throws a `MedBudChallengeError` carrying `CHALLENGED_CODE`, and the badge renders "MedBud
-check needed" linking to MedBud instead of "lookup failed". The code travels as a field on the response
-because an `Error` does not survive the structured clone across the message channel.
-
-Detection prefers Cloudflare's `cf-mitigated` header — readable because extension fetches carry host
-permissions and are not CORS-restricted — and falls back to sniffing the interstitial body, but only on
-403 and 503, so an ordinary 403 is still reported as an ordinary 403.
-
-Once challenged, the module fails fast for five minutes rather than sending one doomed request per
-card: a grid of 23 cards otherwise produces 23 blocked requests against a site that is explicitly
-asking for less automated load. That backoff is module state, so it resets when the MV3 worker is
-evicted — which is the right default, since the next page load then re-probes whether the user has
-cleared the challenge.
-
-Worth knowing for the project's standing: MedBud's `robots.txt` disallows AI crawlers by name
-(`ClaudeBot`, `GPTBot`, `OAI-SearchBot`, and others) but allows `*` on `/strains/`, which is what this
-extension reads. The extension's access pattern — a signed-in human's browser, one index fetch per six
-hours, cached ratings — is within that. Bulk or automated collection outside a user's own browsing
-would not be.
-
 ## Testing
 
-The scoring and microdata parsing are pure functions and are tested directly. `card-scanner.js` is not
+The scoring and mapping are pure functions and are tested directly. `card-scanner.js` is not
 — it needs a DOM — and it is also the module most exposed to a portal reskin, so it is tested against
 the real card grid rather than hand-written markup that would drift from the site.
 
@@ -271,14 +226,11 @@ the aggregate block, so the trimming does not flatter it.
 
 | Data | TTL | Reason |
 | --- | --- | --- |
-| Medication index | 6 h | New medications are listed constantly. |
-| Product rating | 6 h | Ratings move slowly, but a day-old average is not worth showing. |
-| Successful match | 12 h | Product identity does not change; only its rating does. |
-| Failed match | 1 h | The likeliest cause is a strain MedBud has not indexed yet. |
-
-TTLs alone would still hide a strain added to MedBud shortly after an index fetch, so a failed match
-against an index older than 30 minutes forces a refetch and one retry before the miss is accepted.
+| Successful match | 12 h | Product identity does not change. |
+| Failed match | 1 h | The likeliest cause is a medication MedBud has only just listed. |
 
 Cache entries live under a `cache:` prefix in `chrome.storage.local` so they can be cleared without
-touching settings, which live in `chrome.storage.sync`. The tokenised form of the index is additionally
-memoised in the service worker for its lifetime, keyed on the index fetch timestamp.
+touching settings, which live in `chrome.storage.sync`. The match cache key carries a resolution
+version, so improving the matcher or the mapping retires every entry from the old logic at once. The
+tokenised form of the bundled formulary is memoised in the service worker for its lifetime.
+

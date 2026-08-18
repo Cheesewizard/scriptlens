@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { createBadge, applyRating, applyBlocked, applyError } from "../src/content/rating-badge.js";
+import { createBadge, applyRating, appendStrainLink, applyError, STRAIN_LINK_CLASS } from "../src/content/rating-badge.js";
 import { parseFragment } from "./helpers/dom.mjs";
 
 function badge()
@@ -19,13 +19,11 @@ test("starts in a loading state", () =>
 	assert.equal(element.textContent, "MedBud…");
 });
 
-// The bundled formulary resolves the page but no rating is fetched, so the link
-// is the payload.
-test("a match with no rating fetched offers the page", () =>
+test("a matched product links to its MedBud page", () =>
 {
 	const element = badge();
 
-	applyRating(element, { matched: true, ratingsFetched: false, url: "https://medbud.wiki/strains/hilltop-leaf/xsm-t30-xs-mintz/" });
+	applyRating(element, { matched: true, url: "https://medbud.wiki/strains/hilltop-leaf/xsm-t30-xs-mintz/" });
 
 	const link = element.querySelector("a");
 
@@ -35,9 +33,8 @@ test("a match with no rating fetched offers the page", () =>
 	assert.equal(link.getAttribute("target"), "_blank");
 });
 
-// A card whose page has to be found through a search is indistinguishable, to
-// the reader, from one resolved directly: same label, same look. The search is
-// the rare fallback, and the badge does not advertise it as a lesser state.
+// A search fallback is indistinguishable from a direct link: same label, same
+// look. The search is the rare case, and the badge does not advertise it.
 test("an unmatched product still reads as a link to MedBud", () =>
 {
 	const element = badge();
@@ -54,7 +51,7 @@ test("an unmatched product still reads as a link to MedBud", () =>
 test("a matched and an unmatched product are visually identical", () =>
 {
 	const matched = badge();
-	applyRating(matched, { matched: true, ratingsFetched: false, url: "https://medbud.wiki/strains/a/b/" });
+	applyRating(matched, { matched: true, url: "https://medbud.wiki/strains/a/b/" });
 
 	const unmatched = badge();
 	applyRating(unmatched, { matched: false, searchUrl: "https://www.google.com/search?q=x" });
@@ -63,45 +60,28 @@ test("a matched and an unmatched product are visually identical", () =>
 	assert.equal(matched.querySelector("a").textContent, unmatched.querySelector("a").textContent);
 });
 
-test("a fetched rating still renders stars and the average", () =>
+test("appends a Leafly link after the MedBud one", () =>
 {
 	const element = badge();
 
-	applyRating(element, {
-		matched: true,
-		ratingsFetched: true,
-		average: 4,
-		bestRating: 5,
-		ratingCount: 2,
-		reviewCount: 1,
-		url: "https://medbud.wiki/strains/aurora-pedanios/pedanios-t29/",
-		categories: [{ label: "Medicinal Effect", average: 4 }]
-	});
+	applyRating(element, { matched: true, url: "https://medbud.wiki/strains/a/b/" });
+	appendStrainLink(element, "https://www.google.com/search?q=White+Fire+site%3Aleafly.com");
 
-	assert.equal(element.dataset.state, "rated");
-	assert.equal(element.dataset.tier, "high");
-	assert.match(element.textContent, /4\.00 · 2 ratings/);
-	assert.match(element.title, /Medicinal Effect: 4\.0/);
+	const leafly = element.querySelector(`.${STRAIN_LINK_CLASS}`);
+
+	assert.equal(leafly.textContent, "Leafly");
+	assert.match(leafly.getAttribute("href"), /leafly\.com/);
 });
 
-test("a fetched but unrated product says so", () =>
+test("does not append a second Leafly link", () =>
 {
 	const element = badge();
 
-	applyRating(element, { matched: true, ratingsFetched: true, average: null, ratingCount: 0, url: "https://medbud.wiki/strains/x/y/" });
+	applyRating(element, { matched: true, url: "https://medbud.wiki/strains/a/b/" });
+	appendStrainLink(element, "https://www.google.com/search?q=x");
+	appendStrainLink(element, "https://www.google.com/search?q=x");
 
-	assert.equal(element.dataset.state, "unrated");
-	assert.equal(element.querySelector("a").textContent, "Not yet rated");
-});
-
-test("a challenge is reported as clearable, pointing at the blocked request", () =>
-{
-	const element = badge();
-
-	applyBlocked(element, "MedBud is challenging automated requests.");
-
-	assert.equal(element.dataset.state, "blocked");
-	assert.equal(element.querySelector("a").getAttribute("href"), "https://medbud.wiki/strains/");
+	assert.equal(element.querySelectorAll(`.${STRAIN_LINK_CLASS}`).length, 1);
 });
 
 test("an unexpected failure keeps the reason on the badge", () =>
@@ -112,4 +92,10 @@ test("an unexpected failure keeps the reason on the badge", () =>
 
 	assert.equal(element.dataset.state, "error");
 	assert.equal(element.title, "boom");
+});
+
+test("rejects a missing badge or result", () =>
+{
+	assert.throws(() => applyRating(null, {}), /badge is required/);
+	assert.throws(() => applyRating(badge(), null), /result is required/);
 });

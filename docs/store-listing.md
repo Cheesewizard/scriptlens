@@ -75,13 +75,8 @@ on the CB1 Medical patient portal, so the user can research a product without le
 - Host permission `https://patient.cb1medical.com/*`
   ```
   The extension runs only on the CB1 Medical portal. It reads the product name each card already exposes
-  in its accessibility label and adds the review/profile links. This is the extension's entire function.
-  ```
-- Host permission `https://medbud.wiki/*`
-  ```
-  Used only if the user turns on the off-by-default "Fetch ratings from MedBud" option, to read a
-  medication's public schema.org rating data. Disabled by default; with it off, nothing is requested
-  from MedBud.
+  in its accessibility label and adds the review/profile links. This is the extension's entire function,
+  and the only site it requests.
   ```
 
 **Remote code:** No, it does not use remote code.

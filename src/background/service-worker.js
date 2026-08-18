@@ -1,5 +1,5 @@
 import { clearCache } from "./http-cache.js";
-import { loadIndex, INDEX_TTL_MS } from "./medbud-index.js";
+import { loadIndex } from "./medbud-index.js";
 import { requestRating } from "./rating-service.js";
 import { MESSAGE_TYPES } from "../shared/messages.js";
 import { loadSettings } from "../shared/settings.js";
@@ -15,10 +15,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
 		.catch(reason =>
 		{
 			error(reason);
-
-			// The code travels separately because an Error does not survive the
-			// structured clone across the message channel.
-			sendResponse({ ok: false, reason: reason?.message ?? String(reason), code: reason?.code ?? null });
+			sendResponse({ ok: false, reason: reason?.message ?? String(reason) });
 		});
 
 	// Keeps the message channel open for the asynchronous response above.
@@ -35,26 +32,13 @@ async function handleMessage(message)
 		case MESSAGE_TYPES.REQUEST_RATING:
 			return requestRating(message.productName);
 
-		case MESSAGE_TYPES.REFRESH_INDEX:
-			return describeIndex(await loadIndex({ forceRefresh: true, live: true }));
-
 		case MESSAGE_TYPES.CLEAR_CACHE:
 			return { removedEntries: await clearCache() };
 
 		case MESSAGE_TYPES.GET_STATUS:
-			return { ...describeIndex(await loadIndex({ live: settings.liveRatings })), settings };
+			return { indexedProducts: (await loadIndex()).paths.length, settings };
 
 		default:
 			throw new Error(`Unknown message type: ${message?.type}`);
 	}
-}
-
-function describeIndex(index)
-{
-	return {
-		indexedProducts: index.paths.length,
-		fetchedAt: index.fetchedAt,
-		expiresAt: index.fetchedAt + INDEX_TTL_MS,
-		bundled: index.bundled === true
-	};
 }

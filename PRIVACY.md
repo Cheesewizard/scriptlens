@@ -15,15 +15,12 @@ your order history, or anything else about you or your account.
 ## What leaves your browser, and where it goes
 
 - **Nothing goes to a ScriptLens server, because there isn't one.**
-- **Search fallback:** when a product is not in the bundled data, ScriptLens builds a web-search link from
-  the product name (e.g. a Google search scoped to MedBud, or Leafly). The search only happens when
-  **you click or hover** the link — the product name, and nothing else, forms the query. This is the
-  same thing you would type into a search box yourself.
-- **MedBud ratings (off by default):** the "Fetch ratings from MedBud" option, if you turn it on, would
-  request medication pages from `medbud.wiki`. It is disabled by default and currently blocked by
-  MedBud's own protection.
+- **ScriptLens never fetches anything** — it only ever builds links for you to click. When a product is
+  not in the bundled data, the link is a web search built from the product name (a Google search scoped
+  to MedBud, or to Leafly). Navigating there happens only when **you click** the link, exactly as if you
+  had typed the name into a search box yourself.
 
-No request ScriptLens makes carries any information about you — only the public name of a medication.
+No link ScriptLens builds carries any information about you — only the public name of a medication.
 
 ## What it stores
 
@@ -34,8 +31,8 @@ that enabled for extensions. You can clear all cached data from the settings pag
 ## Permissions
 
 - **Storage** — to keep your settings and the link cache locally.
-- **Access to `patient.cb1medical.com`** — to read product names and add the links.
-- **Access to `medbud.wiki`** — only used if you enable the off-by-default ratings option.
+- **Access to `patient.cb1medical.com`** — the only site the extension runs on, to read product names
+  and add the links. It requests no other site.
 
 ## Contact
 

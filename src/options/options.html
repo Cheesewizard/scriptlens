@@ -30,27 +30,15 @@
 				</p>
 
 				<label class="checkbox">
-					<input id="liveRatings" type="checkbox">
-					Fetch ratings from MedBud
-				</label>
-				<p class="hint">
-					Off by default. MedBud is behind bot protection that refuses the extension's background
-					requests, so this currently makes every card report a block rather than showing a rating.
-					With it off nothing is requested from MedBud and the badge links to the medication's page
-					instead. Worth trying again if MedBud's protection relaxes.
-				</p>
-
-				<label class="checkbox">
 					<input id="debugLogging" type="checkbox">
 					Log matching decisions to the service worker console
 				</label>
 			</section>
 
 			<section>
-				<h2>MedBud index</h2>
+				<h2>Formulary</h2>
 				<p id="status" class="hint">Loading&hellip;</p>
 				<div class="actions">
-					<button id="refreshIndex" type="button">Refresh now</button>
 					<button id="clearCache" type="button" class="secondary">Clear all cached data</button>
 				</div>
 			</section>

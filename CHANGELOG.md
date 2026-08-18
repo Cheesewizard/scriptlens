@@ -12,9 +12,9 @@ First public release, as **ScriptLens**.
   the right page.
 - Reads **every** product, including those out of stock or over your THC limit — they have no "Add to
   cart" button but still show reviews worth reading.
-- Runs entirely in the browser: no analytics, no account, no server, and no personal or medical data
-  ever leaves your browser. See [PRIVACY.md](PRIVACY.md).
+- Runs entirely in the browser: it fetches nothing and only ever builds links for you to click. No
+  analytics, no account, no server, and no personal or medical data ever leaves your browser. Its only
+  site permission is the CB1 Medical portal itself. See [PRIVACY.md](PRIVACY.md).
 
-Inline rating numbers are not shown: MedBud is behind bot protection that refuses the extension's
-background requests, so ScriptLens links to the reviews rather than fetching them. The option to fetch
-them is present but off by default, in case that protection relaxes.
+ScriptLens links to the reviews rather than showing rating numbers on the card: reading MedBud's data
+programmatically would need their permission, and their pages are behind bot protection that refuses it.

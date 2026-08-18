@@ -1,6 +1,6 @@
 import { findProductCards, findTitleElement, PRODUCT_ATTRIBUTE } from "./card-scanner.js";
-import { createBadge, applyRating, applyError, applyBlocked, appendStrainLink, BADGE_CLASS } from "./rating-badge.js";
-import { CHALLENGED_CODE, MESSAGE_TYPES } from "../shared/messages.js";
+import { createBadge, applyRating, applyError, appendStrainLink, BADGE_CLASS } from "./rating-badge.js";
+import { MESSAGE_TYPES } from "../shared/messages.js";
 import { extractStrain, isFlower } from "../shared/strain.js";
 import { leaflyStrainUrl } from "../shared/leafly-link.js";
 import { loadSettings } from "../shared/settings.js";
@@ -59,14 +59,6 @@ async function decorate(card, productName)
 	try
 	{
 		const response = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.REQUEST_RATING, productName });
-
-		// Being challenged is not a lookup failure: it is a thing the user can
-		// clear, and every card on the page will report it at once.
-		if (response?.code === CHALLENGED_CODE)
-		{
-			applyBlocked(badge, response.reason);
-			return;
-		}
 
 		if (!response?.ok) throw new Error(response?.reason ?? "background lookup failed");
 
