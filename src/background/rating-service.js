@@ -10,6 +10,10 @@ import { debug } from "../shared/logging.js";
 
 const MATCH_TTL_MS = 12 * 60 * 60 * 1000;
 
+// Bumped whenever matching, the formulary or the mapping changes, so a cached
+// result from the old logic is never read back. Old entries expire on their own.
+const RESOLUTION_VERSION = 2;
+
 // A product CB1 lists but MedBud has not indexed yet is retried soon, because a
 // newly released strain is exactly the case this needs to recover from quickly.
 const UNMATCHED_TTL_MS = 60 * 60 * 1000;
@@ -63,21 +67,19 @@ async function resolveRating(productName)
 
 async function resolveMatch(productName, settings)
 {
-	const cacheKey = `match:${productName}`;
+	// The mapping is authoritative and cheap — held in memory after first load —
+	// so it is consulted before the cache. A cached miss from before an entry was
+	// added must never shadow it, which is exactly what browsing these tabs before
+	// the mapping existed would otherwise cause.
+	const mapped = await lookUpMapping(productName, settings.mappingUrl);
+	if (mapped !== null) return { path: mapped, score: 1 };
+
+	// The version in the key retires every entry resolved by older logic: improve
+	// the matcher or the formulary and a product that used to miss is re-evaluated
+	// rather than served a stale miss until its TTL happens to lapse.
+	const cacheKey = `match:${RESOLUTION_VERSION}:${productName}`;
 	const cached = await readCached(cacheKey);
 	if (cached) return cached;
-
-	// The shared mapping first: it holds the medications the matcher cannot
-	// resolve, already answered once on everyone's behalf, and costs no lookup.
-	const mapped = await lookUpMapping(productName, settings.mappingUrl);
-
-	if (mapped !== null)
-	{
-		const resolved = { path: mapped, score: 1 };
-		await writeCached(cacheKey, resolved, MATCH_TTL_MS);
-
-		return resolved;
-	}
 
 	const index = await loadCandidates({ live: settings.liveRatings });
 
