@@ -4,6 +4,11 @@ A browser extension that links every medication in the CB1 Medical patient porta
 [MedBud](https://medbud.wiki) patient reviews and its [Leafly](https://www.leafly.com) strain profile.
 No more opening a second tab and searching for each product by hand.
 
+<p align="center">
+  <img src="docs/preview-1280x800.png" width="760"
+       alt="ScriptLens adds a green 'View on MedBud' button and a separate 'Leafly' button above every product on the CB1 Medical portal">
+</p>
+
 It's free, open source, and not affiliated with CB1 Medical, MedBud or Leafly. It runs entirely in your
 browser. There's no analytics, no account, and no personal or medical data ever leaves it (see the
 [privacy policy](PRIVACY.md)).
