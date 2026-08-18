@@ -26,7 +26,6 @@ content-side code use normal imports. That is why `src/content/*.js` and `src/sh
 | `background/http-cache.js` | TTL cache over `chrome.storage.local`. |
 | `content/card-scanner.js` | Locates product cards and their titles. |
 | `content/rating-badge.js` | Builds and updates the badge DOM. |
-| `content/title-link.js` | Wraps the product title in a link to its MedBud page. |
 | `shared/strain.js` | Pulls the strain name out of a flower product name. |
 | `shared/leafly-link.js` | Builds the Leafly strain search for that name. |
 | `content/main.js` | Scanning loop and mutation observer. |
@@ -50,14 +49,10 @@ The grid recycles DOM nodes when filters or tabs change, so a decorated card can
 different product. Cards record which product they were decorated for in `data-medbud-product`, and a
 result arriving after the node has been reused is discarded.
 
-The title itself becomes a link to the matched MedBud page. It is *wrapped* rather than rewritten: the
-portal's own element, text and attributes are left alone, so React keeps the node it is holding, and
-the wrapper is `display: contents` so it generates no box and the grid layout is unchanged (measured in
-Chrome: zero delta on both the title and card bounding boxes). A real anchor is used instead of a click
-handler so middle-click, the context menu and "open in new tab" all work; the click is stopped from
-propagating because the whole card is clickable in the portal and the name should go to MedBud rather
-than also opening the portal's product page. Recycled cards are unwrapped before redecorating, or a
-card could point at the product it used to show.
+Navigation is the badge alone — a **View on MedBud** button (and, for flower, **Leafly**). The product
+title was once a link too, but that duplicated the button and, on a search fallback, sent the name to a
+Google search, so it was removed. The portal's title element is left untouched; the badge simply sits
+before it.
 
 ## Leafly
 
@@ -270,9 +265,10 @@ with a fixture name. All four are covered because carts and oils are named quite
 products across the four tabs.
 
 A page saved from now on is saved with the extension running, so the tool also strips this extension's
-own badges, title links and `data-medbud-product` attributes. Without that the scanner tests would read
-output they produced themselves — and a scanner run against an undecorated copy finds nothing at all,
-since a card already carrying its product attribute is deliberately skipped.
+own badges and `data-medbud-product` attributes (and title-link wrappers, from pages saved in the
+version that added them). Without that the scanner tests would read output they produced themselves —
+and a scanner run against an undecorated copy finds nothing at all, since a card already carrying its
+product attribute is deliberately skipped.
 
 The saved page is a **patient** page: it carries the account holder's name and their live prescription
 balances. Only the grid subtree is copied, which leaves that data behind, and the tool refuses to write

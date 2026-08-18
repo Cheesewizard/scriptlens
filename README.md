@@ -13,23 +13,18 @@ Each card gains a small badge above its title:
 | Not yet rated | Nobody has rated the medication yet. |
 | MedBud check needed | Live ratings are on and Cloudflare is refusing the request. |
 
-Every card is a link to MedBud — one behaviour, one label. Almost always that is the medication's exact
-page; for the occasional product MedBud has renamed or not yet listed, the same link runs a search that
-lands on it, with nothing on the card to distinguish the two. The product name itself is a link to the
-same place, so clicking the medication goes straight there.
+The **View on MedBud** button is one behaviour, one label. Almost always it opens the medication's exact
+page; for the occasional product MedBud has renamed or not yet listed, the same button runs a search
+that lands on it, with nothing on the card to distinguish the two.
 
-Flower cards carry a second link, **Leafly**, to the strain's terpene and effect profile. MedBud is the
-patient reviews; Leafly is the strain data. Leafly is organised by strain rather than by product and
+Flower cards carry a second button, **Leafly**, to the strain's terpene and effect profile. MedBud is
+the patient reviews; Leafly is the strain data. Leafly is organised by strain rather than by product and
 its naming does not follow from a CB1 name, so this link runs a search scoped to Leafly's strain pages
 rather than guessing a URL that would usually be wrong.
 
 Hovering shows MedBud's per-category breakdown — Medicinal Effect, Tastes & Terpenes, Trim &
 Uniformity, Freshness — which is usually what decides an order. The average links through to the full
 page for the written reviews.
-
-Once a product is matched, its **name on the card becomes a link** to the same MedBud page, opening in
-a new tab. It is an ordinary link, so middle-click and "open in new tab" behave normally, and clicking
-it does not also trigger the card's own navigation.
 
 ## Installing
 

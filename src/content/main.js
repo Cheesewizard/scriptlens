@@ -1,6 +1,5 @@
 import { findProductCards, findTitleElement, PRODUCT_ATTRIBUTE } from "./card-scanner.js";
 import { createBadge, applyRating, applyError, applyBlocked, appendStrainLink, BADGE_CLASS } from "./rating-badge.js";
-import { linkTitle, unlinkTitles, TITLE_LINK_CLASS } from "./title-link.js";
 import { CHALLENGED_CODE, MESSAGE_TYPES } from "../shared/messages.js";
 import { extractStrain, isFlower } from "../shared/strain.js";
 import { leaflyStrainUrl } from "../shared/leafly-link.js";
@@ -8,11 +7,6 @@ import { loadSettings } from "../shared/settings.js";
 import { warn } from "../shared/logging.js";
 
 const RESCAN_DEBOUNCE_MS = 250;
-
-// How long a click will wait for an in-flight lookup before giving up and using
-// the search link. Long enough for a search API round trip, short enough not to
-// feel like a hang.
-const RESOLVE_CLICK_GRACE_MS = 800;
 
 let settings = await loadSettings();
 let rescanTimer = null;
@@ -48,11 +42,8 @@ function scan()
 
 async function decorate(card, productName)
 {
-	// A recycled card can still carry the previous product's badge and title
-	// link. Both go first: the link wraps the title, so it has to be undone
-	// before the title's parent is used as the badge's anchor point.
+	// A recycled card can still carry the previous product's badge.
 	card.querySelector(`.${BADGE_CLASS}`)?.remove();
-	unlinkTitles(card);
 
 	const title = findTitleElement(card, productName);
 
@@ -87,12 +78,6 @@ async function decorate(card, productName)
 			return;
 		}
 
-		// The name always leads somewhere: the matched page when there is one,
-		// otherwise a search, which is how a renamed or newly listed medication
-		// gets found.
-		const destination = response.result.url ?? response.result.searchUrl;
-		if (destination) linkTitle(title, destination);
-
 		if (!response.result.matched && !settings.showUnmatchedProducts)
 		{
 			badge.remove();
@@ -102,9 +87,9 @@ async function decorate(card, productName)
 		renderBadge(badge, response.result, productName);
 
 		// A product the formulary cannot place gets its real page looked up, but
-		// only once you show interest in it. Resolving all forty on page load
-		// would spend a search quota on cards you never look at.
-		if (!response.result.matched) resolveOnInterest(card, title, badge, productName);
+		// only once you hover it. Resolving all forty on page load would spend a
+		// search quota on cards you never look at.
+		if (!response.result.matched) resolveOnInterest(card, badge, productName);
 	}
 	catch (reason)
 	{
@@ -125,72 +110,44 @@ function renderBadge(badge, result, productName)
 	if (strain) appendStrainLink(badge, leaflyStrainUrl(strain));
 }
 
-// Hovering starts the lookup; by the time a click lands it is usually already
-// done and the link simply works. When it is not, the click opens the tab
-// immediately — inside the gesture, so the popup blocker allows it — and points
-// it at the medication as soon as the lookup returns.
-function resolveOnInterest(card, title, badge, productName)
+// Hovering a card resolves its exact MedBud page in the background and swaps the
+// badge's search link for the direct one — so by the time it is clicked it points
+// straight at the medication. Until then the badge already links to a search that
+// finds it, so nothing is lost if the lookup has not finished.
+function resolveOnInterest(card, badge, productName)
 {
-	let pending = null;
-	let resolvedUrl = null;
+	let started = false;
 
 	const start = () =>
 	{
-		if (pending === null) pending = lookUpLink(card, title, badge, productName).then((url) => (resolvedUrl = url));
+		if (started) return;
 
-		return pending;
+		started = true;
+		lookUpLink(card, badge, productName);
 	};
 
 	card.addEventListener("pointerenter", start);
 
-	// Touch and keyboard never fire pointerenter, so the click still has to work.
+	// Touch and keyboard never fire pointerenter, so a tap still triggers it.
 	card.addEventListener("pointerdown", start);
-
-	card.addEventListener("click", (event) =>
-	{
-		const link = event.target.closest?.(`.${TITLE_LINK_CLASS}`);
-		if (!link || resolvedUrl !== null) return;
-
-		const lookup = start();
-		const fallback = link.href;
-
-		event.preventDefault();
-		event.stopPropagation();
-
-		const opened = window.open("", "_blank", "noopener");
-
-		Promise.race([lookup, waitFor(RESOLVE_CLICK_GRACE_MS)])
-			.then((url) => { if (opened) opened.location = url ?? fallback; })
-			.catch(() => { if (opened) opened.location = fallback; });
-	}, true);
 }
 
-async function lookUpLink(card, title, badge, productName)
+async function lookUpLink(card, badge, productName)
 {
 	try
 	{
 		const response = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.RESOLVE_LINK, productName });
 
 		if (!response?.ok) throw new Error(response?.reason ?? "link lookup failed");
-		if (!response.result.url) return null;
+		if (!response.result.url) return;
 
 		// The card may have been recycled while the lookup was in flight.
-		if (card.getAttribute(PRODUCT_ATTRIBUTE) !== productName) return null;
+		if (card.getAttribute(PRODUCT_ATTRIBUTE) !== productName) return;
 
-		linkTitle(title, response.result.url);
 		if (badge.isConnected) renderBadge(badge, { matched: true, ratingsFetched: false, url: response.result.url }, productName);
-
-		return response.result.url;
 	}
 	catch (reason)
 	{
 		warn(`could not resolve a MedBud link for "${productName}"`, reason);
-
-		return null;
 	}
-}
-
-function waitFor(milliseconds)
-{
-	return new Promise((resolve) => setTimeout(() => resolve(null), milliseconds));
 }
