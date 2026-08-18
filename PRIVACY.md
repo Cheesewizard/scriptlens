@@ -37,4 +37,4 @@ that enabled for extensions. You can clear all cached data from the settings pag
 ## Contact
 
 Questions or concerns: open an issue at
-<https://github.com/Cheesewizard/cb1-medbud-ratings>.
+<https://github.com/Cheesewizard/scriptlens>.
