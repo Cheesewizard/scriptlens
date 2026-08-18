@@ -119,6 +119,11 @@ A saved browse page carries your name and your prescription balances. The tool c
 grid and refuses to write a fixture that still contains any of it — but don't commit the saved page
 itself.
 
+## Keeping it current
+
+The data is a frozen snapshot — nothing self-updates. When CB1 rotates stock or either site reskins,
+[docs/MAINTENANCE.md](docs/MAINTENANCE.md) has the symptom-to-fix table and the exact refresh recipes.
+
 ## Caveats
 
 - The portal is read from `aria-label`s, the most stable handle it offers, but a reskin will still
