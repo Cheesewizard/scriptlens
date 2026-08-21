@@ -1,7 +1,8 @@
 # Privacy policy
 
-**StrainInspector does not collect, store, or transmit any personal or medical data.** There is no analytics,
-no tracking, no account, and no server that belongs to StrainInspector.
+**StrainInspector does not automatically send any personal or medical data anywhere.** There is no analytics,
+no tracking, no account, and no server that belongs to StrainInspector. Medication names and link matches are
+processed and cached in your browser as described below.
 
 This is a short, plain-English policy for a tool that runs entirely in your browser.
 
