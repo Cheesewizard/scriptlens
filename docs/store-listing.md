@@ -35,6 +35,7 @@ WHAT IT DOES
 • On flower, a second "Leafly" link opens the strain's terpene and effect profile.
 • Works on all four tabs - flower, oils, vapes and pastilles - and on every product, including ones
   that are out of stock or over your prescription limit.
+• Adds the same links to medication in your past orders, so products remain easy to research later.
 
 HOW IT WORKS
 StrainInspector ships with a snapshot of MedBud's medication list and matches each product locally. A product
@@ -44,8 +45,9 @@ which still lands you on the right page. Nothing is scraped: it only ever offers
 
 PRIVATE BY DESIGN
 StrainInspector runs entirely in your browser. There is no account, no analytics, no tracking, and no server.
-It never reads, stores or transmits your name, your prescription, your allowances or your order history.
-It only reads the public name of the medication shown on a card, and only to build a link. Full privacy
+It never reads, stores or transmits your name, prescription, allowances, order number, order date,
+delivery details or payment details. It only reads the public medication name shown on a catalogue card
+or past-order item, and only to build a link. Full privacy
 policy: https://github.com/Cheesewizard/strain-inspector/blob/main/PRIVACY.md
 
 NOT MEDICAL ADVICE
@@ -81,9 +83,9 @@ on the CB1 Medical patient portal, so the user can research a product without le
   ```
 - Host permission `https://patient.cb1medical.com/*`
   ```
-  The extension runs only on the CB1 Medical portal. It reads the product name each card already exposes
-  in its accessibility label and adds the review/profile links. This is the extension's entire function,
-  and the only site it requests.
+  The extension runs only on the CB1 Medical portal. It reads the product name that catalogue cards and
+  past-order items already expose in accessibility labels and adds the review/profile links. This is the
+  extension's entire function, and the only site it requests.
   ```
 
 **Remote code:** No, it does not use remote code.

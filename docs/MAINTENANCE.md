@@ -26,7 +26,7 @@ The cache (in `rating-service.js`) just remembers the answer per product name, k
 | A **new cart / oil / pastille** links to search | Not in the mapping | Recipe B |
 | A card links to the **wrong** medication | Bad mapping entry, or a bad matcher match | Recipe C |
 | **All** cards link to search after an update | Stale cache shadowing new logic | Recipe E |
-| **No badges at all** | CB1 reskinned the portal | Recipe D |
+| **No badges on browse or past-order pages** | CB1 reskinned the portal | Recipe D |
 
 ## Recipes
 
@@ -83,8 +83,9 @@ The one that matters most - a wrong rating on a medicine is worse than none.
 
 ### D. Badges vanished - portal reskin
 
-The scanner keys off `aria-label="Add … to request"`. If CB1 changes that, `findProductCards` returns
-nothing. Regenerate the fixture for the affected tab and run the scanner tests to see what broke:
+The browse scanner keys off the product image's `<product name> image` accessibility label. If CB1
+changes that, `findProductCards` returns nothing for catalogue cards. Regenerate the fixture for the
+affected tab and run the scanner tests to see what broke:
 
 ```bash
 node tools/make-card-fixture.mjs "path/to/Browse - CB1 Medical.html"            # flower
@@ -93,8 +94,13 @@ node tools/make-card-fixture.mjs "path/to/oil - CB1 Medical.html" cb1-oil-grid.h
 node tools/make-card-fixture.mjs "path/to/pastil - CB1 Medical.html" cb1-pastille-grid.html
 ```
 
-If the fixture comes out empty, the label format changed - update the selectors in `card-scanner.js`
-(and, if the strain moved, `shared/strain.js`) until the scanner tests pass again.
+If the fixture comes out empty, the image label format changed - update the selectors in
+`card-scanner.js` (and, if the strain moved, `shared/strain.js`) until the scanner tests pass again.
+
+Past-order rows have no product image. They are keyed by the accessible
+`View script for <product name>` button and validated against the exact title in the same row. If browse
+still works but past orders do not, inspect that control's `aria-label` and update the captured
+`cb1-past-order-item.html` structure without copying order, delivery, payment, or patient details.
 
 ### E. Bump the resolution version
 

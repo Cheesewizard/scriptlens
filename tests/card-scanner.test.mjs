@@ -5,6 +5,7 @@ import { findProductCards, findTitleElement, PRODUCT_ATTRIBUTE } from "../src/co
 import { loadFixture, parseFragment } from "./helpers/dom.mjs";
 
 const GRID = "cb1-browse-grid.html";
+const PAST_ORDER = "cb1-past-order-item.html";
 
 // The four portal tabs, with the full product count on each - every card, not
 // only the orderable ones. A product that is out of stock or over the patient's
@@ -52,6 +53,39 @@ test("finds cards that have no add button", () =>
 		const found = findProductCards(document).some((entry) => entry.productName === overLimit);
 		assert.ok(found, `the scanner missed ${overLimit} on the ${tab} tab`);
 	}
+});
+
+test("finds a medication on a past-order page with no product image", () =>
+{
+	const document = loadFixture(PAST_ORDER);
+	const cards = findProductCards(document);
+
+	assert.equal(document.querySelector("[aria-label$=' image']"), null);
+	assert.equal(cards.length, 1);
+	assert.equal(cards[0].productName, "LIT WF Smalls T30 White Fire Flower 10g");
+	assert.equal(findTitleElement(cards[0].card, cards[0].productName)?.textContent.trim(), cards[0].productName);
+});
+
+test("skips a past-order item already decorated with the same medication", () =>
+{
+	const document = loadFixture(PAST_ORDER);
+	const [item] = findProductCards(document);
+
+	item.card.setAttribute(PRODUCT_ATTRIBUTE, item.productName);
+
+	assert.deepEqual(findProductCards(document), []);
+});
+
+test("ignores a script control whose medication title is not in the same row", () =>
+{
+	const document = parseFragment(`
+		<div>
+			<div dir="auto">A Different Product T20 Flower 10g</div>
+			<button aria-label="View script for Missing Product T20 Flower 10g">View script</button>
+		</div>
+	`);
+
+	assert.deepEqual(findProductCards(document), []);
 });
 
 // The card is accepted only when it also holds the title bearing the same product

@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "StrainInspector",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Adds MedBud patient-review and Leafly strain-profile links to every medication on the CB1 Medical portal. Not affiliated.",
 	"icons": {
 		"16": "icons/icon-16.png",

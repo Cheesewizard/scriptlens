@@ -23,7 +23,7 @@ content-side code use normal imports. That is why `src/content/*.js` and `src/sh
 | `shared/medbud-link.js` | Builds the medication URL, or the search that replaces it. |
 | `background/request-queue.js` | Caps concurrent outbound requests. |
 | `background/http-cache.js` | TTL cache over `chrome.storage.local`. |
-| `content/card-scanner.js` | Locates product cards and their titles. |
+| `content/card-scanner.js` | Locates catalogue cards and past-order items with their titles. |
 | `content/rating-badge.js` | Builds and updates the badge DOM. |
 | `shared/strain.js` | Pulls the strain name out of a flower product name. |
 | `shared/leafly-link.js` | Builds the Leafly strain search for that name. |
@@ -32,7 +32,8 @@ content-side code use normal imports. That is why `src/content/*.js` and `src/sh
 ## Reading the CB1 portal
 
 The portal is React Native Web, so class names are hashed atomic utilities (`css-146c3p1 r-1jkcow7`)
-and worthless as selectors. Accessibility labels, however, are stable and carry the exact product name:
+and worthless as selectors. Accessibility labels, however, are stable and carry the exact product name.
+Catalogue cards expose it through the product image:
 
 ```html
 <div aria-label="LIT WF Smalls T30 White Fire Flower 10g image">…</div>
@@ -49,6 +50,16 @@ The image is used rather than the "Add to request" button on purpose. A product 
 over the patient's THC limit has no add button - it shows a disabled "THC (%) limit" instead - but it
 still has an image and a title, and its reviews are worth just as much. Keying off the button silently
 hid every such product: on the flower tab that was 88 of 128. The image is present on every card.
+
+Past-order items use a different stable anchor because they have no product image:
+
+```html
+<div dir="auto">LIT WF Smalls T30 White Fire Flower 10g</div>
+<button aria-label="View script for LIT WF Smalls T30 White Fire Flower 10g">…</button>
+```
+
+The scanner reads the name after `View script for ` and applies the same exact-title validation before
+decorating the row. It does not read the order number, date, delivery, payment, or patient details.
 
 The grid recycles DOM nodes when filters or tabs change, so a decorated card can come back holding a
 different product. Cards record which product they were decorated for in `data-medbud-product`, and a
@@ -203,8 +214,9 @@ keying off the image and comparing title text removed that whole class of fragil
 ### Fixtures
 
 `tests/fixtures/cb1-*-grid.html` are the real card grids from all four portal tabs, extracted from
-saved pages by `tools/make-card-fixture.mjs`. Regenerate one by saving that tab and re-running the tool
-with a fixture name. All four are covered because carts and oils are named quite differently to flower
+saved pages by `tools/make-card-fixture.mjs`. `cb1-past-order-item.html` is the privacy-safe medication-row
+structure from a real past order, with personal and price details removed. All four catalogue tabs are
+covered because carts and oils are named quite differently to flower
 (`T800`, `25:25`) and their cards are not guaranteed to share markup - the scanner reads every card on
 each (128 / 56 / 54 / 2 at the time of writing), over-limit and out-of-stock included.
 
@@ -233,4 +245,3 @@ Cache entries live under a `cache:` prefix in `chrome.storage.local` so they can
 touching settings, which live in `chrome.storage.sync`. The match cache key carries a resolution
 version, so improving the matcher or the mapping retires every entry from the old logic at once. The
 tokenised form of the bundled formulary is memoised in the service worker for its lifetime.
-

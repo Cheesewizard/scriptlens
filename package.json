@@ -1,6 +1,6 @@
 {
 	"name": "strain-inspector",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"private": true,
 	"type": "module",
 	"description": "Browser extension that links every medication in the CB1 Medical portal to its MedBud reviews and Leafly strain profile.",

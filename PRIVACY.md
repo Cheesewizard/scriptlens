@@ -7,10 +7,10 @@ This is a short, plain-English policy for a tool that runs entirely in your brow
 
 ## What it reads
 
-On the CB1 Medical portal (`patient.cb1medical.com`), StrainInspector reads the **product name** shown on each
-medication card - the text CB1 already puts in the page's accessibility labels. That is all it takes
-from the page. It does **not** read, store, or transmit your name, your prescription, your allowances,
-your order history, or anything else about you or your account.
+On the CB1 Medical portal (`patient.cb1medical.com`), StrainInspector reads the **product name** shown on
+each catalogue card and past-order item - the text CB1 already puts in the page's accessibility labels.
+That is all it takes from the page. It does **not** read, store, or transmit your name, prescription,
+allowances, order number, order date, delivery details, payment details, or anything else about your account.
 
 ## What leaves your browser, and where it goes
 

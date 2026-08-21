@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+- Adds **View on MedBud** and **Leafly** links to medication in past orders, using the order row's
+  accessibility label and an exact title check without reading other order details.
+- Updates the privacy policy, store listing and maintenance documentation for past-order support.
+
 ## 1.0.0
 
 First public release, as **StrainInspector**.

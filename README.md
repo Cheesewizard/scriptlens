@@ -20,11 +20,12 @@ It's free, open source, and not affiliated with CB1 Medical, MedBud or Leafly. I
 browser. There's no analytics, no account, and no personal or medical data ever leaves it (see the
 [privacy policy](PRIVACY.md)).
 
-Every card gets a small **View on MedBud** button above its title. Most of the time it opens the
-medication's exact MedBud page. If MedBud has renamed a product or hasn't listed it yet, the button runs
-a search that lands on it instead, and the card looks the same either way.
+Every catalogue card and medication in a past order gets a small **View on MedBud** button above its
+title. Most of the time it opens the medication's exact MedBud page. If MedBud has renamed a product or
+hasn't listed it yet, the button runs a search that lands on it instead, and the item looks the same
+either way.
 
-Flower cards get a second button, **Leafly**, for the strain's terpene and effect profile. MedBud has
+Flower gets a second button, **Leafly**, for the strain's terpene and effect profile. MedBud has
 the patient reviews, Leafly has the strain data. Leafly names its strains differently from CB1, so that
 link runs a search scoped to Leafly's strain pages rather than guessing a URL that would usually be
 wrong.
@@ -35,8 +36,13 @@ requests anyway, so StrainInspector sends you to the reviews instead of scraping
 
 ## Installing
 
-Until it's on the Chrome Web Store, load it unpacked. This works in Chrome, Brave, Edge and other
-Chromium browsers.
+Install it from the Chrome Web Store. It works in Chrome, Brave, Edge and other Chromium browsers.
+
+*(The listing is currently in review; the link will go live here once it's published.)*
+
+### Installing from source
+
+If you'd rather load it unpacked:
 
 1. Download this repository (**Code → Download ZIP**, or clone it) and unzip it.
 2. Open `chrome://extensions` and turn on **Developer mode**.
@@ -47,9 +53,9 @@ There's no build step. It loads as-is.
 ## How it works
 
 StrainInspector carries a built-in copy of MedBud's product list. When a page loads, it reads each product's
-name from the card and looks it up. A confident match links straight to that medication's MedBud page;
-anything it can't place (a renamed product, or one added since the built-in list was captured) links to
-a MedBud search instead, which still lands you on it.
+name from its catalogue card or past-order row and looks it up. A confident match links straight to that
+medication's MedBud page; anything it can't place (a renamed product, or one added since the built-in list
+was captured) links to a MedBud search instead, which still lands you on it.
 
 The search fallback is normal, not a failure. Stock rotates and MedBud renames things, and some products
 can't be matched by name alone, but either way you still get a working link. Resolved links are cached
