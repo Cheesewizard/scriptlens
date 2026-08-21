@@ -5,6 +5,7 @@
 - Adds **View on MedBud** and **Leafly** links to medication in past orders, using the order row's
   accessibility label and an exact title check without reading other order details.
 - Updates the privacy policy, store listing and maintenance documentation for past-order support.
+- Makes the source available under the PolyForm Shield License 1.0.0, which prohibits competing products.
 
 ## 1.0.0
 

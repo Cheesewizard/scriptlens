@@ -16,7 +16,7 @@ No more opening a second tab and searching for each product by hand.
   </a>
 </p>
 
-It's free, open source, and not affiliated with CB1 Medical, MedBud or Leafly. It runs entirely in your
+It's free to install, source available under the PolyForm Shield License, and not affiliated with CB1 Medical, MedBud or Leafly. It runs entirely in your
 browser. There's no analytics, no account, and no personal or medical data ever leaves it (see the
 [privacy policy](PRIVACY.md)).
 

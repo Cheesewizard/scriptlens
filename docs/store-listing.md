@@ -55,7 +55,7 @@ StrainInspector surfaces publicly available patient opinions and strain informat
 and it is not affiliated with or endorsed by CB1 Medical, MedBud or Leafly. Decisions about your
 medication belong with your prescriber.
 
-Free and open source: https://github.com/Cheesewizard/strain-inspector
+Free and source available: https://github.com/Cheesewizard/strain-inspector
 Support development: https://github.com/sponsors/Cheesewizard
 ```
 
